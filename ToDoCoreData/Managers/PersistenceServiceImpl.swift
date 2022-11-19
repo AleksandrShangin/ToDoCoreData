@@ -9,20 +9,21 @@ import Foundation
 import CoreData
 
 protocol PersistenceService {
+    // Generic
+    func fetch<T: NSFetchRequestResult>(completion: (Result<[T], Error>) -> Void)
+    func deleteEntity<T: NSManagedObject>(entity: T, completion: (Result<Void, Error>) -> Void)
+    func updateEntity<T: NSManagedObject>(entity: T, completion: (Result<Void, Error>) -> Void)
+    
     // Categories
-    func createCategory(name: String, completion: (Bool) -> Void)
+    func createCategory(name: String, completion: (Result<Void, Error>) -> Void)
     func fetchAllCategories(completion: (Result<[Category], Error>) -> Void)
-    func updateCategory(category: Category, newName: String, completion: (Bool) -> Void)
-    func deleteCategory(category: Category, completion: (Bool) -> Void)
     // Projects
-    func createNewProject(category: Category, name: String, completion: (Bool) -> Void)
+    func createNewProject(category: Category, name: String, completion: (Result<Void, Error>) -> Void)
     func fetchProjectsAndTasks(for category: Category, completion: ([Organizer]) -> Void)
-    func updateProject(project: Project, newName: String, completion: (Bool) -> Void)
+    func updateProject(project: Project, completion: (Result<Void, Error>) -> Void)
     func deleteProject(project: Project, completion: (Bool) -> Void)
     // Tasks
     func createNewTask(category: Category, project: Project, name: String, completion: (Bool) -> Void)
-    func completeTask(task: Task, completion: (Bool) -> Void)
-    func deleteTask(task: Task, completion: (Bool) -> Void)
 }
 
 final class PersistenceServiceImpl: PersistenceService {
@@ -59,65 +60,69 @@ final class PersistenceServiceImpl: PersistenceService {
         }
     }
     
-    // MARK: - Category Methods
+    // MARK: - Generic Methods
     
-    func createCategory(name: String, completion: (Bool) -> Void) {
-        let category = Category(context: context)
-        category.name = name
+    func fetch<T: NSFetchRequestResult>(completion: (Result<[T], Error>) -> Void) {
+        let request = NSFetchRequest<T>(entityName: String(describing: T.self))
         do {
-            try context.save()
-            completion(true)
-        } catch {
-            print(error.localizedDescription)
-            completion(false)
-        }
-    }
-    
-    func fetchAllCategories(completion: (Result<[Category], Error>) -> Void) {
-        let request = NSFetchRequest<Category>(entityName: "Category")
-        do {
-            let categories = try context.fetch(request)
-            completion(.success(categories))
+            let results = try context.fetch(request)
+            completion(.success(results))
         } catch {
             completion(.failure(error))
         }
     }
     
-    func updateCategory(category: Category, newName: String, completion: (Bool) -> Void) {
-        category.name = newName
+    func deleteEntity<T: NSManagedObject>(entity: T, completion: (Result<Void, Error>) -> Void) {
+        context.delete(entity)
         do {
             try context.save()
-            completion(true)
+            completion(.success(()))
         } catch {
-            print(error.localizedDescription)
-            completion(false)
+            completion(.failure(error))
         }
     }
     
-    func deleteCategory(category: Category, completion: (Bool) -> Void) {
-        context.delete(category)
+    func updateEntity<T: NSManagedObject>(entity: T, completion: (Result<Void, Error>) -> Void) {
         do {
             try context.save()
-            completion(true)
+            completion(.success(()))
         } catch {
-            print(error.localizedDescription)
-            completion(false)
+            completion(.failure(error))
         }
+    }
+    
+    func createEntity(type: NSManagedObject, completion: (Result<Void, Error>) -> Void) {
+        
+    }
+    
+    // MARK: - Category Methods
+    
+    func createCategory(name: String, completion: (Result<Void, Error>) -> Void) {
+        let category = Category(context: context)
+        category.name = name
+        do {
+            try context.save()
+            completion(.success(()))
+        } catch {
+            completion(.failure(error))
+        }
+    }
+    
+    func fetchAllCategories(completion: (Result<[Category], Error>) -> Void) {
+        self.fetch(completion: completion)
     }
     
     // MARK: - Projects Methods
     
-    func createNewProject(category: Category, name: String, completion: (Bool) -> Void) {
+    func createNewProject(category: Category, name: String, completion: (Result<Void, Error>) -> Void) {
         let newProject = Project(context: context)
         newProject.name = name
         newProject.category = category
         do {
             try context.save()
-            print("saved")
-            completion(true)
+            completion(.success(()))
         } catch {
-            print(error)
-            completion(false)
+            completion(.failure(error))
         }
     }
     
@@ -146,15 +151,8 @@ final class PersistenceServiceImpl: PersistenceService {
         }
     }
     
-    func updateProject(project: Project, newName: String, completion: (Bool) -> Void) {
-        project.name = newName
-        do {
-            try context.save()
-            completion(true)
-        } catch {
-            print(error)
-            completion(false)
-        }
+    func updateProject(project: Project, completion: (Result<Void, Error>) -> Void) {
+        self.updateEntity(entity: project, completion: completion)
     }
     
     func deleteProject(project: Project, completion: (Bool) -> Void) {
@@ -204,48 +202,12 @@ final class PersistenceServiceImpl: PersistenceService {
         }
     }
     
-    func completeTask(task: Task, completion: (Bool) -> Void) {
-        task.isCompleted = true
-        do {
-            try context.save()
-            completion(true)
-        } catch {
-            print(error.localizedDescription)
-            completion(false)
-        }
+    func fetchAllTasks(completion: (Result<[Task], Error>) -> Void) {
+        self.fetch(completion: completion)
     }
     
-    func undoCompleteTask(task: Task, completion: (Bool) -> Void) {
-        task.isCompleted = false
-        do {
-            try context.save()
-            completion(true)
-        } catch {
-            print(error.localizedDescription)
-            completion(false)
-        }
-    }
-    
-    func deleteTask(task: Task, completion: (Bool) -> Void) {
-        context.delete(task)
-        do {
-            try context.save()
-            completion(true)
-        } catch {
-            print(error.localizedDescription)
-            completion(false)
-        }
-    }
-    
-    func updateTask(task: Task, newName: String, completion: (Bool) -> Void) {
-        task.name = newName
-        do {
-            try context.save()
-            completion(true)
-        } catch {
-            print(error)
-            completion(false)
-        }
+    func fetchAllProjects(completion: (Result<[Project], Error>) -> Void) {
+        self.fetch(completion: completion)
     }
     
 }

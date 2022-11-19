@@ -12,55 +12,74 @@ final class CategoriesViewController: UIViewController {
 
     // MARK: - Properties
     
+    weak var tableView: UITableView!
+    
+    private var router: CategoriesRouter!
     private let viewModel = CategoriesViewModel()
-    
     private var subscriptions = Set<AnyCancellable>()
-    
-    // MARK: - UI Elements
-    
-    private let tableView = setup(UITableView()) {
-        $0.register(CategoryTableViewCell.self, forCellReuseIdentifier: CategoryTableViewCell.identifier)
-        $0.showsVerticalScrollIndicator = false
-    }
     
     // MARK: - Lifecycle
     
+    override func loadView() {
+        let view = CategoriesView()
+        self.view = view
+        tableView = view.tableView
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        configureRouter()
         setupNavigationItems()
         setupTableView()
         fetchAllCategories()
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        tableView.frame = view.bounds
+        configureBindings()
     }
     
     // MARK: - Setup
     
+    private func configureRouter() {
+        router = CategoriesRouter(viewController: self)
+    }
+    
     private func setupTableView() {
-        view.addSubview(tableView)
         tableView.dataSource = self
         tableView.delegate = self
     }
     
     private func setupNavigationItems() {
-        navigationItem.title = viewModel.title
-        let rightBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(didTapAdd))
-        navigationItem.rightBarButtonItem = rightBarButton
+        navigationItem.title = "Organizer"
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            barButtonSystemItem: .add,
+            target: self,
+            action: #selector(didTapAdd)
+        )
     }
     
-    // MARK: - Fetch Data
+    // MARK: - Load Data
     
     private func fetchAllCategories() {
         viewModel.fetchCategories()
+    }
+    
+    // MARK: - Bindings
+    
+    private func configureBindings() {
         viewModel.categories
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-            guard let self = self else { return }
-            self.tableView.reloadData()
-        }.store(in: &subscriptions)
+                guard let self = self else { return }
+                self.tableView.reloadData()
+            }
+            .store(in: &subscriptions)
+        
+        viewModel.onError
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                guard let self = self else { return }
+                self.presentErrorAlert(message: error.localizedDescription)
+            }
+            .store(in: &subscriptions)
     }
     
     // MARK: - Actions
@@ -117,10 +136,7 @@ extension CategoriesViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let category = viewModel.categories.value[indexPath.section]
-        let tasksViewModel = TasksViewModel(category: category)
-        let tasksViewController = TasksViewController(viewModel: tasksViewModel)
-        tasksViewController.title = category.name ?? "No Category"
-        navigationController?.pushViewController(tasksViewController, animated: true)
+        router.showTasks(of: category)
     }
     
 }
@@ -142,11 +158,11 @@ extension CategoriesViewController: CategoryTableViewCellDelegate {
     func presentActionSheet(category: Category) {
         let renameAction = UIAlertAction(title: "Rename Category", style: .default) { [weak self] _ in
             self?.presentAddAlert(title: "Rename Category", message: nil, updateName: category.name) { newName in
-                self?.viewModel.update(category, name: newName)
+                self?.viewModel.update(category, newName: newName)
             }
         }
         let deleteAction = UIAlertAction(title: "Delete Category", style: .destructive) { [weak self] _ in
-            self?.presentAlert(title: "Delete Project?", message: nil, okHandler: {
+            self?.presentAlert(title: "Delete Category?", message: nil, okHandler: {
                 self?.viewModel.delete(category)
             })
         }

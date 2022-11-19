@@ -1,5 +1,5 @@
 //
-//  ToDoViewController.swift
+//  ProjectsViewController.swift
 //  ToDoCoreData
 //
 //  Created by Alex on 4/20/21.
@@ -8,24 +8,18 @@
 import UIKit
 import Combine
 
-final class TasksViewController: UIViewController {
+final class ProjectsViewController: UIViewController {
     
     // MARK: - Properties
     
-    private let viewModel: TasksViewModel
+    private var tableView: UITableView!
     
+    private let viewModel: ProjectsViewModel
     private var cancellable = Set<AnyCancellable>()
-    
-    // MARK: - UI Elements
-    
-    private let tableView = setup(UITableView(frame: .zero, style: .grouped)) {
-        $0.register(ProjectHeaderView.self, forHeaderFooterViewReuseIdentifier: ProjectHeaderView.identifier)
-        $0.register(TaskTableViewCell.self, forCellReuseIdentifier: TaskTableViewCell.identifier)
-    }
     
     // MARK: - Init
     
-    init(viewModel: TasksViewModel) {
+    init(viewModel: ProjectsViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -36,75 +30,92 @@ final class TasksViewController: UIViewController {
     
     // MARK: - Lifecycle
     
+    override func loadView() {
+        let view = ProjectsView()
+        self.view = view
+        self.tableView = view.tableView
+    
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupSubviews()
-        bind()
+        loadData()
+        configureViews()
+        configureNavigationBar()
+        configureBindings()
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        tableView.frame = view.bounds
+    // MARK: - Configure
+    
+    private func configureNavigationBar() {
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            barButtonSystemItem: .add,
+            target: self,
+            action: #selector(didTapAddButton)
+        )
     }
     
-    // MARK: - Setup
-    
-    private func setupSubviews() {
-        view.backgroundColor = .systemBackground
-        setupTableView()
-        setupNavigationButtons()
-    }
-    
-    private func setupTableView() {
-        view.addSubview(tableView)
+    private func configureViews() {
         tableView.dataSource = self
         tableView.delegate = self
     }
     
-    private func setupNavigationButtons() {
-        let rightBarButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(didTapRightBarButton))
-        navigationItem.rightBarButtonItem = rightBarButton
-    }
+    // MARK: - Overriden Methods
     
     override func setEditing(_ editing: Bool, animated: Bool) {
         super.setEditing(editing, animated: true)
         tableView.setEditing(editing, animated: true)
     }
     
-    // MARK: - Actions
+    // MARK: - Load Data
     
-    @objc func didTapRightBarButton() {
-        presentAddAlert(title: "New Project", updateName: nil) { [weak self] name in
-            guard let self = self else { return }
-            self.viewModel.createNewProject(name: name)
-        }
+    private func loadData() {
+        viewModel.fetchProjectsAndTasks()
     }
     
-    private func bind() {
-        viewModel.fetchAllTasks()
-        viewModel.tasks
+    // MARK: - Bindings
+    
+    private func configureBindings() {
+        viewModel.projects
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.tableView.reloadData()
             }
             .store(in: &cancellable)
+        
+        viewModel.onError
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                guard let self = self else { return }
+                self.presentErrorAlert(message: error.localizedDescription)
+            }
+            .store(in: &cancellable)
+    }
+    
+    // MARK: - Actions
+    
+    @objc func didTapAddButton() {
+        presentAddAlert(title: "New Project", updateName: nil) { [weak self] name in
+            guard let self = self else { return }
+            self.viewModel.createNewProject(name: name)
+        }
     }
 
 }
 
 // MARK: - TableView Methods
 
-extension TasksViewController: UITableViewDataSource, UITableViewDelegate {
+extension ProjectsViewController: UITableViewDataSource, UITableViewDelegate {
 
     // Sections
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return viewModel.tasks.value.count
+        return viewModel.projects.value.count
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: ProjectHeaderView.identifier) as? ProjectHeaderView else { return nil }
-        let title = viewModel.tasks.value[section].project.name
+        let title = viewModel.projects.value[section].project.name
         header.tag = section
         header.configure(with: title ?? "Other")
         header.delegate = self
@@ -118,7 +129,7 @@ extension TasksViewController: UITableViewDataSource, UITableViewDelegate {
     // Rows
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let project = viewModel.tasks.value[section].project
+        let project = viewModel.projects.value[section].project
         return project.tasks?.count ?? 0
     }
     
@@ -129,44 +140,15 @@ extension TasksViewController: UITableViewDataSource, UITableViewDelegate {
         ) as? TaskTableViewCell else {
             fatalError("Wrong Cell")
         }
-        let task = viewModel.tasks.value[indexPath.section].tasks[indexPath.row]
+        let task = viewModel.projects.value[indexPath.section].tasks[indexPath.row]
         let theTask = TaskViewModel(title: task.name!, isCompleted: task.isCompleted)
         cell.configure(with: theTask)
         return cell
     }
     
-    
-//    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-//        if editingStyle == .delete {
-//            let selectedItem = tasks[indexPath.row]
-//            PersistenceManager.shared.deleteItem(item: selectedItem)
-//            tasks.remove(at: indexPath.row)
-//            for (index, task) in tasks.enumerated() {
-//                task.index = Int64(index)
-//            }
-//            fetchAllTasks()
-//        }
-//    }
-
-//    func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-//        let movedItem = tasks[sourceIndexPath.row]
-//        tasks.remove(at: sourceIndexPath.row)
-//        tasks.insert(movedItem, at: destinationIndexPath.row)
-//        for (index, task) in tasks.enumerated() {
-//            task.index = Int64(index)
-//        }
-//        do {
-//            try context.save()
-//            fetchAllTasks()
-//        } catch let error as NSError {
-//            print("Could not save/persist Core Data items in moveRowAt: \(error)")
-//        }
-//
-//    }
-    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let selectedTask = viewModel.tasks.value[indexPath.section].tasks[indexPath.row]
+        let selectedTask = viewModel.projects.value[indexPath.section].tasks[indexPath.row]
         
         let undoCompleteAction = UIAlertAction(title: "Undo Complete", style: .default) { [weak self] _ in
             guard let self = self else { return }
@@ -205,11 +187,11 @@ extension TasksViewController: UITableViewDataSource, UITableViewDelegate {
 
 // MARK: - Extension For ProjectHeaderViewDelegate
 
-extension TasksViewController: ProjectHeaderViewDelegate {
+extension ProjectsViewController: ProjectHeaderViewDelegate {
     
     func didTapAddTask(_ view: ProjectHeaderView) {
         let section = view.tag
-        let project = viewModel.tasks.value[section].project
+        let project = viewModel.projects.value[section].project
         presentActionSheet(section: section, project: project)
     }
     

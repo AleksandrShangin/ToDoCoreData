@@ -8,51 +8,81 @@
 import Foundation
 import Combine
 
-final class CategoriesViewModel {
+protocol CategoriesViewModelProtocol {
+    var categories: CurrentValueSubject<[Category], Never> { get }
+    var onError: PassthroughSubject<Error, Never> { get }
     
-    private(set) var title = "Organizer"
+    func fetchCategories()
+    func addNewCategory(name: String)
+    func delete(_ category: Category)
+    func update(_ category: Category, newName: String)
+}
+
+final class CategoriesViewModel: CategoriesViewModelProtocol {
+    
+    //MARK: - Public Properties
     
     var categories = CurrentValueSubject<[Category], Never>([Category]())
+    var onError = PassthroughSubject<Error, Never>()
+    
+    //MARK: - Private Properties
+    
+    private let persistenceService: PersistenceService
+    
+    //MARK: - Init
+    
+    init(persistenceService: PersistenceService = PersistenceServiceImpl.shared) {
+        self.persistenceService = persistenceService
+    }
+    
+    //MARK: - Public Methods
     
     func fetchCategories() {
-        PersistenceServiceImpl.shared.fetchAllCategories { [weak self] result in
+        persistenceService.fetchAllCategories { [weak self] result in
+            guard let self = self else { return }
             switch result {
             case .success(let categories):
-                self?.categories.send(categories)
+                self.categories.send(categories)
             case .failure(let error):
-                print(error)
+                self.onError.send(error)
             }
         }
     }
     
     func addNewCategory(name: String) {
-        PersistenceServiceImpl.shared.createCategory(name: name) { [weak self] success in
-            if success {
-                self?.fetchCategories()
-            } else {
-                print("Error Adding new category")
+        persistenceService.createCategory(name: name) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success:
+                self.fetchCategories()
+            case .failure(let error):
+                self.onError.send(error)
             }
         }
     }
     
     func delete(_ category: Category) {
-        PersistenceServiceImpl.shared.deleteCategory(category: category) { [weak self] success in
-            if success {
-                self?.fetchCategories()
-            } else {
-                print("Error Deleting new category")
+        persistenceService.deleteEntity(entity: category) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success:
+                self.fetchCategories()
+            case .failure(let error):
+                self.onError.send(error)
             }
         }
     }
     
-    func update(_ category: Category, name: String) {
-        PersistenceServiceImpl.shared.updateCategory(category: category, newName: name) { [weak self] success in
-            if success {
-                self?.fetchCategories()
-            } else {
-                 print("Error Updating category")
+    func update(_ category: Category, newName: String) {
+        category.name = newName
+        persistenceService.updateEntity(entity: category) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success:
+                self.fetchCategories()
+            case .failure(let error):
+                self.onError.send(error)
             }
-            
         }
     }
     

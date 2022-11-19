@@ -35,6 +35,12 @@ extension UIViewController {
         present(alert, animated: true)
     }
     
+    func presentErrorAlert(message: String) {
+        let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .cancel))
+        present(alert, animated: true)
+    }
+    
     func presentActionSheet(title: String?, message: String?, actions: [UIAlertAction]) {
         let actionSheet = UIAlertController(
             title: nil,
