@@ -7,21 +7,26 @@
 
 import Foundation
 import CoreData
+import Combine
 
 protocol PersistenceService {
-    // Generic
-    func fetch<T: NSFetchRequestResult>(completion: (Result<[T], Error>) -> Void)
+    // Generic Combine Methods
+    func fetch<T: NSManagedObject>(entity: T.Type) -> AnyPublisher<[T], Error>
+    func fetch<T: NSManagedObject>(entity: T.Type, predicate: NSPredicate) -> AnyPublisher<[T], Error>
+    func delete<T: NSManagedObject>(entity: T) -> AnyPublisher<Void, Error>
+    func delete<T: NSManagedObject>(entities: [T]) -> AnyPublisher<Void, Error>
+    // Generic Closure Methods
+    func fetch<T: NSManagedObject>(entity: T.Type, completion: (Result<[T], Error>) -> Void)
+    func fetch<T: NSManagedObject>(entity: T.Type, predicate: NSPredicate, completion: (Result<[T], Error>) -> Void)
     func deleteEntity<T: NSManagedObject>(entity: T, completion: (Result<Void, Error>) -> Void)
+    func delete<T: NSManagedObject>(entity: T, predicate: NSPredicate, completion: (Result<Void, Error>) -> Void)
+    
     func updateEntity<T: NSManagedObject>(entity: T, completion: (Result<Void, Error>) -> Void)
     
     // Categories
     func createCategory(name: String, completion: (Result<Void, Error>) -> Void)
-    func fetchAllCategories(completion: (Result<[Category], Error>) -> Void)
     // Projects
     func createNewProject(category: Category, name: String, completion: (Result<Void, Error>) -> Void)
-    func fetchProjectsAndTasks(for category: Category, completion: ([Organizer]) -> Void)
-    func updateProject(project: Project, completion: (Result<Void, Error>) -> Void)
-    func deleteProject(project: Project, completion: (Bool) -> Void)
     // Tasks
     func createNewTask(category: Category, project: Project, name: String, completion: (Bool) -> Void)
 }
@@ -62,8 +67,48 @@ final class PersistenceServiceImpl: PersistenceService {
     
     // MARK: - Generic Methods
     
-    func fetch<T: NSFetchRequestResult>(completion: (Result<[T], Error>) -> Void) {
+    func fetch<T: NSManagedObject>(entity: T.Type) -> AnyPublisher<[T], Error> {
+        return Future { [weak self] promise in
+            guard let self = self else { return }
+            let request = NSFetchRequest<T>(entityName: String(describing: T.self))
+            do {
+                let results = try self.context.fetch(request)
+                promise(.success(results))
+            } catch {
+                promise(.failure(error))
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+    
+    func fetch<T: NSManagedObject>(entity: T.Type, predicate: NSPredicate) -> AnyPublisher<[T], Error> {
+        return Future { [weak self] promise in
+            guard let self = self else { return }
+            let request = NSFetchRequest<T>(entityName: String(describing: T.self))
+            request.predicate = predicate
+            do {
+                let results = try self.context.fetch(request)
+                promise(.success(results))
+            } catch {
+                promise(.failure(error))
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+    
+    func fetch<T: NSManagedObject>(entity: T.Type, completion: (Result<[T], Error>) -> Void) {
         let request = NSFetchRequest<T>(entityName: String(describing: T.self))
+        do {
+            let results = try context.fetch(request)
+            completion(.success(results))
+        } catch {
+            completion(.failure(error))
+        }
+    }
+    
+    func fetch<T: NSManagedObject>(entity: T.Type, predicate: NSPredicate, completion: (Result<[T], Error>) -> Void) {
+        let request = NSFetchRequest<T>(entityName: String(describing: T.self))
+        request.predicate = predicate
         do {
             let results = try context.fetch(request)
             completion(.success(results))
@@ -80,6 +125,38 @@ final class PersistenceServiceImpl: PersistenceService {
         } catch {
             completion(.failure(error))
         }
+    }
+    
+    func delete<T: NSManagedObject>(entity: T, predicate: NSPredicate, completion: (Result<Void, Error>) -> Void) {
+        
+    }
+    
+    func delete<T: NSManagedObject>(entity: T) -> AnyPublisher<Void, Error> {
+        return Future { [weak self] promise in
+            guard let self = self else { return }
+            self.context.delete(entity)
+            do {
+                try self.context.save()
+                promise(.success(()))
+            } catch {
+                promise(.failure(error))
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+
+    func delete<T: NSManagedObject>(entities: [T]) -> AnyPublisher<Void, Error> {
+        return Future { [weak self] promise in
+            guard let self = self else { return }
+            entities.forEach { self.context.delete($0) }
+            do {
+                try self.context.save()
+                promise(.success(()))
+            } catch {
+                promise(.failure(error))
+            }
+        }
+        .eraseToAnyPublisher()
     }
     
     func updateEntity<T: NSManagedObject>(entity: T, completion: (Result<Void, Error>) -> Void) {
@@ -108,10 +185,6 @@ final class PersistenceServiceImpl: PersistenceService {
         }
     }
     
-    func fetchAllCategories(completion: (Result<[Category], Error>) -> Void) {
-        self.fetch(completion: completion)
-    }
-    
     // MARK: - Projects Methods
     
     func createNewProject(category: Category, name: String, completion: (Result<Void, Error>) -> Void) {
@@ -123,59 +196,6 @@ final class PersistenceServiceImpl: PersistenceService {
             completion(.success(()))
         } catch {
             completion(.failure(error))
-        }
-    }
-    
-    func fetchProjectsAndTasks(for category: Category, completion: ([Organizer]) -> Void) {
-        let request = NSFetchRequest<Project>(entityName: "Project")
-        guard let categoryName = category.name else { return }
-        let predicate = NSPredicate(format: "category.name = %@", categoryName)
-        request.predicate = predicate
-        var projectTasks: [Organizer] = []
-        do {
-            let projects = try context.fetch(request)
-            for project in projects {
-                let request = NSFetchRequest<Task>(entityName: "Task")
-                let predicate = NSPredicate(format: "project.name = %@", project.name!)
-                request.predicate = predicate
-                do {
-                    let tasks = try context.fetch(request)
-                    projectTasks.append(Organizer(project: project, tasks: tasks))
-                } catch {
-                    print(error)
-                }
-            }
-            completion(projectTasks)
-        } catch {
-            print(error)
-        }
-    }
-    
-    func updateProject(project: Project, completion: (Result<Void, Error>) -> Void) {
-        self.updateEntity(entity: project, completion: completion)
-    }
-    
-    func deleteProject(project: Project, completion: (Bool) -> Void) {
-        let request = NSFetchRequest<Task>(entityName: "Task")
-        let predicate = NSPredicate(format: "project.name = %@", project.name!)
-        request.predicate = predicate
-        do {
-            let tasks = try context.fetch(request)
-            for task in tasks {
-                context.delete(task)
-            }
-            context.delete(project)
-            do {
-                try context.save()
-                print("Project Deleted")
-                completion(true)
-            } catch {
-                print(error.localizedDescription)
-                completion(false)
-            }
-        } catch {
-            print(error)
-            completion(false)
         }
     }
     
@@ -200,14 +220,6 @@ final class PersistenceServiceImpl: PersistenceService {
             print(error.localizedDescription)
             completion(false)
         }
-    }
-    
-    func fetchAllTasks(completion: (Result<[Task], Error>) -> Void) {
-        self.fetch(completion: completion)
-    }
-    
-    func fetchAllProjects(completion: (Result<[Project], Error>) -> Void) {
-        self.fetch(completion: completion)
     }
     
 }

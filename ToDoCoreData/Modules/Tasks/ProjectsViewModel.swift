@@ -13,6 +13,7 @@ protocol ProjectsViewModelProtocol {
     var onError: PassthroughSubject<Error, Never> { get }
     
     func fetchProjectsAndTasks()
+    
     func createNewProject(name: String)
     func updateProject(project: Project, newName: String)
     func deleteProject(project: Project)
@@ -35,6 +36,7 @@ final class ProjectsViewModel: ProjectsViewModelProtocol {
     //MARK: - Private Properties
     
     private let persistenceService: PersistenceService
+    private var subscriptions = Set<AnyCancellable>()
     
     //MARK: - Init
     
@@ -46,8 +48,29 @@ final class ProjectsViewModel: ProjectsViewModelProtocol {
     // MARK: - Project Methods
     
     func fetchProjectsAndTasks() {
-        persistenceService.fetchProjectsAndTasks(for: category) { [weak self] tasks in
-            self?.projects.send(tasks)
+        var projectTasks: [Organizer] = []
+        
+        guard let categoryName = category.name else { return }
+        let predicate = NSPredicate(format: "category.name = %@", categoryName)
+        persistenceService.fetch(entity: Project.self, predicate: predicate) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let projects):
+                for project in projects {
+                    let predicate = NSPredicate(format: "project.name = %@", project.name!)
+                    persistenceService.fetch(entity: Task.self, predicate: predicate) { result in
+                        switch result {
+                        case .success(let tasks):
+                            projectTasks.append(Organizer(project: project, tasks: tasks))
+                        case .failure(let error):
+                            self.onError.send(error)
+                        }
+                    }
+                }
+                self.projects.send(projectTasks)
+            case .failure(let error):
+                self.onError.send(error)
+            }
         }
     }
     
@@ -74,21 +97,31 @@ final class ProjectsViewModel: ProjectsViewModelProtocol {
                 self.onError.send(error)
             }
         }
-//        persistenceService.updateProject(project: project) { [weak self] result in
-//            guard let self = self else { return }
-//            switch result {
-//            case .success:
-//                self.fetchProjectsAndTasks()
-//            case .failure(let error):
-//                self.onError.send(error)
-//            }
-//        }
     }
     
     func deleteProject(project: Project) {
-        persistenceService.deleteProject(project: project) { [weak self] success in
-            if success {
-                self?.fetchProjectsAndTasks()
+        let predicate = NSPredicate(format: "project.name = %@", project.name!)
+        persistenceService.fetch(entity: Task.self, predicate: predicate) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let tasks):
+                Publishers.Zip(
+                    self.persistenceService.delete(entity: project),
+                    self.persistenceService.delete(entities: tasks)
+                )
+                .sink { completion in
+                    switch completion {
+                    case .finished:
+                        print("Deletion finished")
+                    case .failure(let error):
+                        self.onError.send(error)
+                    }
+                } receiveValue: { _ in
+                    self.fetchProjectsAndTasks()
+                }
+                .store(in: &subscriptions)
+            case .failure(let error):
+                self.onError.send(error)
             }
         }
     }

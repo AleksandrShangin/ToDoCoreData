@@ -28,6 +28,7 @@ final class CategoriesViewModel: CategoriesViewModelProtocol {
     //MARK: - Private Properties
     
     private let persistenceService: PersistenceService
+    private var subscriptions = Set<AnyCancellable>()
     
     //MARK: - Init
     
@@ -38,15 +39,20 @@ final class CategoriesViewModel: CategoriesViewModelProtocol {
     //MARK: - Public Methods
     
     func fetchCategories() {
-        persistenceService.fetchAllCategories { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success(let categories):
+        self.persistenceService.fetch(entity: Category.self)
+            .sink { [weak self] completion in
+                guard let self = self else { return }
+                switch completion {
+                case .finished:
+                    print("Done fetching categories")
+                case .failure(let error):
+                    self.onError.send(error)
+                }
+            } receiveValue: { [weak self] categories in
+                guard let self = self else { return }
                 self.categories.send(categories)
-            case .failure(let error):
-                self.onError.send(error)
             }
-        }
+            .store(in: &self.subscriptions)
     }
     
     func addNewCategory(name: String) {
