@@ -10,6 +10,8 @@ import CoreData
 import Combine
 
 protocol PersistenceService {
+    var context: NSManagedObjectContext { get }
+    func saveContext() throws
     // Generic Combine Methods
     func fetch<T: NSManagedObject>(entity: T.Type) -> AnyPublisher<[T], Error>
     func fetch<T: NSManagedObject>(entity: T.Type, predicate: NSPredicate) -> AnyPublisher<[T], Error>
@@ -20,6 +22,7 @@ protocol PersistenceService {
     func fetch<T: NSManagedObject>(entity: T.Type, predicate: NSPredicate, completion: (Result<[T], Error>) -> Void)
     func deleteEntity<T: NSManagedObject>(entity: T, completion: (Result<Void, Error>) -> Void)
     func delete<T: NSManagedObject>(entity: T, predicate: NSPredicate, completion: (Result<Void, Error>) -> Void)
+    func createEntity(object: NSManagedObject, completion: (Result<Void, Error>) -> Void)
     
     func updateEntity<T: NSManagedObject>(entity: T, completion: (Result<Void, Error>) -> Void)
     
@@ -53,7 +56,7 @@ final class PersistenceServiceImpl: PersistenceService {
 
     // MARK: - Core Data Saving support
 
-    func saveContext () {
+    func saveContext() throws {
         if context.hasChanges {
             do {
                 try context.save()
@@ -65,7 +68,7 @@ final class PersistenceServiceImpl: PersistenceService {
         }
     }
     
-    // MARK: - Generic Methods
+    // MARK: - Generic Combine Methods
     
     func fetch<T: NSManagedObject>(entity: T.Type) -> AnyPublisher<[T], Error> {
         return Future { [weak self] promise in
@@ -95,6 +98,46 @@ final class PersistenceServiceImpl: PersistenceService {
         }
         .eraseToAnyPublisher()
     }
+    
+    func delete<T: NSManagedObject>(entity: T) -> AnyPublisher<Void, Error> {
+        return Future { [weak self] promise in
+            guard let self = self else { return }
+            self.context.delete(entity)
+            do {
+                try self.context.save()
+                promise(.success(()))
+            } catch {
+                promise(.failure(error))
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+
+    func delete<T: NSManagedObject>(entities: [T]) -> AnyPublisher<Void, Error> {
+        return Future { [weak self] promise in
+            guard let self = self else { return }
+            entities.forEach { self.context.delete($0) }
+            do {
+                try self.context.save()
+                promise(.success(()))
+            } catch {
+                promise(.failure(error))
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+    
+    func insert(object: NSManagedObject, completion: (Result<Void, Error>) -> Void) {
+        context.insert(object)
+        do {
+            try saveContext()
+            completion(.success(()))
+        } catch {
+            completion(.failure(error))
+        }
+    }
+    
+    // MARK: - Generic Closure Methods
     
     func fetch<T: NSManagedObject>(entity: T.Type, completion: (Result<[T], Error>) -> Void) {
         let request = NSFetchRequest<T>(entityName: String(describing: T.self))
@@ -131,34 +174,6 @@ final class PersistenceServiceImpl: PersistenceService {
         
     }
     
-    func delete<T: NSManagedObject>(entity: T) -> AnyPublisher<Void, Error> {
-        return Future { [weak self] promise in
-            guard let self = self else { return }
-            self.context.delete(entity)
-            do {
-                try self.context.save()
-                promise(.success(()))
-            } catch {
-                promise(.failure(error))
-            }
-        }
-        .eraseToAnyPublisher()
-    }
-
-    func delete<T: NSManagedObject>(entities: [T]) -> AnyPublisher<Void, Error> {
-        return Future { [weak self] promise in
-            guard let self = self else { return }
-            entities.forEach { self.context.delete($0) }
-            do {
-                try self.context.save()
-                promise(.success(()))
-            } catch {
-                promise(.failure(error))
-            }
-        }
-        .eraseToAnyPublisher()
-    }
-    
     func updateEntity<T: NSManagedObject>(entity: T, completion: (Result<Void, Error>) -> Void) {
         do {
             try context.save()
@@ -168,8 +183,8 @@ final class PersistenceServiceImpl: PersistenceService {
         }
     }
     
-    func createEntity(type: NSManagedObject, completion: (Result<Void, Error>) -> Void) {
-        
+    func createEntity(object: NSManagedObject, completion: (Result<Void, Error>) -> Void) {
+//        let i = object(context: context)
     }
     
     // MARK: - Category Methods

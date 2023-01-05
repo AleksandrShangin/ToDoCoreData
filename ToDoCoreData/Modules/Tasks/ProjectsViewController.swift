@@ -179,9 +179,8 @@ extension ProjectsViewController: UITableViewDataSource, UITableViewDelegate {
         
         let actions = !selectedTask.isCompleted ? [completeAction, updateAction, deleteAction, cancelAction] : [undoCompleteAction, updateAction, deleteAction, cancelAction]
         
-        presentActionSheet(title: nil, message: nil, actions: actions)
+        presentAlert(title: nil, message: nil, style: .actionSheet, actions: actions)
     }
-    
     
 }
 
@@ -216,7 +215,7 @@ extension ProjectsViewController: ProjectHeaderViewDelegate {
         })
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
         
-        presentActionSheet(title: nil, message: nil, actions: [addAction, updateAction, deleteAction, cancelAction])
+        presentAlert(style: .actionSheet, actions: [addAction, updateAction, deleteAction, cancelAction])
     }
     
 }

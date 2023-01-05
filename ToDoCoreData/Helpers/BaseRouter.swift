@@ -15,5 +15,4 @@ class BaseRouter {
         self.viewController = viewController
     }
     
-    
 }

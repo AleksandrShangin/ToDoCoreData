@@ -9,7 +9,12 @@ import UIKit
 
 final class CategoriesView: UIView {
     
-    var tableView: UITableView!
+    //MARK: - Properties
+    
+    var layout: UICollectionViewFlowLayout!
+    var collectionView: UICollectionView!
+    
+    //MARK: - Init
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -20,23 +25,35 @@ final class CategoriesView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    //MARK: - Lifecycle
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         setupConstraints()
     }
  
+    //MARK: - Setup
+    
     private func setupSubviews() {
-        tableView = {
-            let i = UITableView()
-            i.register(CategoryTableViewCell.self, forCellReuseIdentifier: CategoryTableViewCell.identifier)
-            i.showsVerticalScrollIndicator = false
+        layout = {
+            let i = UICollectionViewFlowLayout()
+            i.scrollDirection = .vertical
             return i
         }()
-        addSubview(tableView)
+        
+        collectionView = {
+            let i = UICollectionView(frame: .zero, collectionViewLayout: layout)
+            i.register(CategoryCollectionViewCell.self, forCellWithReuseIdentifier: CategoryCollectionViewCell.identifier)
+            i.showsVerticalScrollIndicator = false
+            i.automaticallyAdjustsScrollIndicatorInsets = true
+            i.contentInsetAdjustmentBehavior = .automatic
+            return i
+        }()
+        addSubview(collectionView)
     }
     
     private func setupConstraints() {
-        tableView.frame = bounds
+        collectionView.frame = bounds
     }
     
 }

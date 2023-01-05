@@ -100,26 +100,11 @@ final class ProjectsViewModel: ProjectsViewModelProtocol {
     }
     
     func deleteProject(project: Project) {
-        let predicate = NSPredicate(format: "project.name = %@", project.name!)
-        persistenceService.fetch(entity: Task.self, predicate: predicate) { [weak self] result in
+        persistenceService.deleteEntity(entity: project) { [weak self] result in
             guard let self = self else { return }
             switch result {
-            case .success(let tasks):
-                Publishers.Zip(
-                    self.persistenceService.delete(entity: project),
-                    self.persistenceService.delete(entities: tasks)
-                )
-                .sink { completion in
-                    switch completion {
-                    case .finished:
-                        print("Deletion finished")
-                    case .failure(let error):
-                        self.onError.send(error)
-                    }
-                } receiveValue: { _ in
-                    self.fetchProjectsAndTasks()
-                }
-                .store(in: &subscriptions)
+            case .success:
+                self.fetchProjectsAndTasks()
             case .failure(let error):
                 self.onError.send(error)
             }
@@ -129,15 +114,28 @@ final class ProjectsViewModel: ProjectsViewModelProtocol {
     // MARK: - Task Methods
     
     func createNewTask(project: Project, name: String) {
-        persistenceService.createNewTask(
-            category: category,
-            project: project,
-            name: name
-        ) { [weak self] success in
-            if success {
-                self?.fetchProjectsAndTasks()
-            }
+        let task = Task(context: persistenceService.context)
+        task.category = self.category
+        task.project = project
+        task.name = name
+        task.isCompleted = false
+        
+        do {
+            try persistenceService.saveContext()
+            self.fetchProjectsAndTasks()
+        } catch {
+            self.onError.send(error)
         }
+        
+//        persistenceService.createNewTask(
+//            category: category,
+//            project: project,
+//            name: name
+//        ) { [weak self] success in
+//            if success {
+//                self?.fetchProjectsAndTasks()
+//            }
+//        }
     }
     
     func completeTask(_ task: Task) {
