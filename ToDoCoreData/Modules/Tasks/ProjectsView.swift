@@ -42,7 +42,7 @@ final class ProjectsView: UIView {
                 style: .grouped
             )
             i.register(ProjectHeaderView.self, forHeaderFooterViewReuseIdentifier: ProjectHeaderView.identifier)
-            i.register(TaskTableViewCell.self, forCellReuseIdentifier: TaskTableViewCell.identifier)
+            i.register(TaskTableViewCell.self, forCellReuseIdentifier: TaskTableViewCell.cellId)
             return i
         }()
         addSubview(tableView)

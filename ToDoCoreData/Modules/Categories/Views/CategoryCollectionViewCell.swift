@@ -12,7 +12,6 @@ protocol CategoryCollectionViewCellDelegate: AnyObject {
 }
 
 final class CategoryCollectionViewCell: UICollectionViewCell {
-    static let identifier = "CategoryCollectionViewCell"
     
     // MARK: - Properties
     

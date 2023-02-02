@@ -13,7 +13,6 @@ struct TaskViewModel {
 }
 
 final class TaskTableViewCell: UITableViewCell {
-    static let identifier = "TaskTableViewCell"
     
     // MARK: - Properties
     

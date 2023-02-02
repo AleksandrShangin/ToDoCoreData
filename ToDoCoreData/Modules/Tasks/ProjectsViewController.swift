@@ -34,7 +34,6 @@ final class ProjectsViewController: UIViewController {
         let view = ProjectsView()
         self.view = view
         self.tableView = view.tableView
-    
     }
     
     override func viewDidLoad() {
@@ -135,7 +134,7 @@ extension ProjectsViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(
-            withIdentifier: TaskTableViewCell.identifier,
+            withIdentifier: TaskTableViewCell.cellId,
             for: indexPath
         ) as? TaskTableViewCell else {
             fatalError("Wrong Cell")

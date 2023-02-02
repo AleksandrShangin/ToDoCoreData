@@ -46,7 +46,7 @@ final class CategoriesView: UIView {
                 frame: .zero,
                 collectionViewLayout: layout
             )
-            i.register(CategoryCollectionViewCell.self, forCellWithReuseIdentifier: CategoryCollectionViewCell.identifier)
+            i.register(CategoryCollectionViewCell.self, forCellWithReuseIdentifier: CategoryCollectionViewCell.cellId)
             i.showsVerticalScrollIndicator = false
             i.automaticallyAdjustsScrollIndicatorInsets = true
             i.contentInsetAdjustmentBehavior = .automatic

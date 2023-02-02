@@ -38,3 +38,16 @@ extension UIView {
 struct Constants {
     static let mainInsets: CGFloat = 8
 }
+
+
+extension UITableViewCell {
+    static var cellId: String {
+        return String(describing: self)
+    }
+}
+
+extension UICollectionViewCell {
+    static var cellId: String {
+        return String(describing: self)
+    }
+}
