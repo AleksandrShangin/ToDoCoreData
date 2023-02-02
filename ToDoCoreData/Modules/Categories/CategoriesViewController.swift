@@ -103,9 +103,8 @@ extension CategoriesViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CategoryCollectionViewCell.cellId, for: indexPath) as? CategoryCollectionViewCell else {
-            return UICollectionViewCell()
-        }
+        let cell = collectionView.dequeueCell(CategoryCollectionViewCell.self, for: indexPath)
+        
         let category = viewModel.categories.value[indexPath.row]
         cell.delegate = self
         cell.configure(with: category.name ?? "No Name")

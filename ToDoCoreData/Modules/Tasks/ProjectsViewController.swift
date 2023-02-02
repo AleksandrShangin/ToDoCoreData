@@ -113,7 +113,8 @@ extension ProjectsViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: ProjectHeaderView.identifier) as? ProjectHeaderView else { return nil }
+        let header = tableView.dequeueView(ProjectHeaderView.self)
+        
         let title = viewModel.projects.value[section].project.name
         header.tag = section
         header.configure(with: title ?? "Other")
@@ -133,12 +134,8 @@ extension ProjectsViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(
-            withIdentifier: TaskTableViewCell.cellId,
-            for: indexPath
-        ) as? TaskTableViewCell else {
-            fatalError("Wrong Cell")
-        }
+        let cell = tableView.dequeueCell(TaskTableViewCell.self, for: indexPath)
+        
         let task = viewModel.projects.value[indexPath.section].tasks[indexPath.row]
         let theTask = TaskViewModel(title: task.name!, isCompleted: task.isCompleted)
         cell.configure(with: theTask)

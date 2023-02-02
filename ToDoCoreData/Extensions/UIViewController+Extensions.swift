@@ -64,11 +64,11 @@ extension UIViewController {
             }
             textField.text = updateName
         }
-        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
+        alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
             guard let text = alert.textFields?.last?.text else { return }
             okHandler(text)
-        }))
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        })
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         present(alert, animated: true)
     }
     

@@ -12,7 +12,6 @@ protocol ProjectHeaderViewDelegate: AnyObject {
 }
 
 final class ProjectHeaderView: UITableViewHeaderFooterView {
-    static let identifier = "ProjectHeaderView"
     
     // MARK: - Properties
     
