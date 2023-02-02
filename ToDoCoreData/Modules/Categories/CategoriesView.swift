@@ -42,7 +42,10 @@ final class CategoriesView: UIView {
         }()
         
         collectionView = {
-            let i = UICollectionView(frame: .zero, collectionViewLayout: layout)
+            let i = UICollectionView(
+                frame: .zero,
+                collectionViewLayout: layout
+            )
             i.register(CategoryCollectionViewCell.self, forCellWithReuseIdentifier: CategoryCollectionViewCell.identifier)
             i.showsVerticalScrollIndicator = false
             i.automaticallyAdjustsScrollIndicatorInsets = true

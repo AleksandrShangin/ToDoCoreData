@@ -12,30 +12,30 @@ struct TaskViewModel {
     let isCompleted: Bool
 }
 
-class TaskTableViewCell: UITableViewCell {
+final class TaskTableViewCell: UITableViewCell {
+    static let identifier = "TaskTableViewCell"
     
     // MARK: - Properties
     
-    static let identifier = "TaskTableViewCell"
-    
-    // MARK: - UI Elements
-    
-    private let statusImageView = setup(UIImageView()) {
-        $0.contentMode = .scaleAspectFit
-    }
-    
-    private let titleLabel = UILabel()
+    private var statusImageView: UIImageView!
+    private var titleLabel: UILabel!
     
     // MARK: - Init
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        contentView.addSubview(statusImageView)
-        contentView.addSubview(titleLabel)
+        setupSubviews()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Lifecycle
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        setupConstraints()
     }
     
     override func prepareForReuse() {
@@ -43,16 +43,32 @@ class TaskTableViewCell: UITableViewCell {
         titleLabel.text = nil
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
+    // MARK: - Setup
+    
+    private func setupSubviews() {
+        statusImageView = {
+            let i = UIImageView()
+            i.contentMode = .scaleAspectFit
+            return i
+        }()
+        contentView.addSubview(statusImageView)
+        
+        titleLabel = {
+            let i = UILabel()
+            return i
+        }()
+        contentView.addSubview(titleLabel)
+    }
+    
+    private func setupConstraints() {
         statusImageView.frame = CGRect(
-            x: 8,
-            y: 8,
-            width: contentView.height-16,
-            height: contentView.height-16
+            x: Constants.mainInsets,
+            y: Constants.mainInsets,
+            width: contentView.height - (Constants.mainInsets * 2),
+            height: contentView.height - (Constants.mainInsets * 2)
         )
         titleLabel.frame = CGRect(
-            x: statusImageView.right + 8,
+            x: statusImageView.right + Constants.mainInsets,
             y: 0,
             width: contentView.width - statusImageView.width - 24,
             height: contentView.height

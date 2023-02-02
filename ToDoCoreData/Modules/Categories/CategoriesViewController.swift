@@ -137,7 +137,7 @@ extension CategoriesViewController: UICollectionViewDelegate, UICollectionViewDe
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 18
+        return 12
     }
     
 }
@@ -159,7 +159,7 @@ extension CategoriesViewController: CategoryCollectionViewCellDelegate {
             }
         }
         let deleteAction = UIAlertAction(title: "Delete Category", style: .destructive) { [weak self] _ in
-            self?.presentAlert(title: "Delete Category?", message: nil, okHandler: {
+            self?.presentOkAlert(title: "Delete Category?", message: nil, okHandler: {
                 self?.viewModel.delete(selectedCategory)
             })
         }

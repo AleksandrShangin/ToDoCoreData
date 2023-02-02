@@ -152,7 +152,7 @@ extension ProjectsViewController: UITableViewDataSource, UITableViewDelegate {
         
         let undoCompleteAction = UIAlertAction(title: "Undo Complete", style: .default) { [weak self] _ in
             guard let self = self else { return }
-            self.presentAlert(title: "Undo Complete?") {
+            self.presentOkAlert(title: "Undo Complete?") {
                 self.viewModel.undoCompleteTask(selectedTask)
             }
         }
@@ -170,7 +170,7 @@ extension ProjectsViewController: UITableViewDataSource, UITableViewDelegate {
         
         let deleteAction = UIAlertAction(title: "Delete Task", style: .destructive) { [weak self] _ in
             guard let self = self else { return }
-            self.presentAlert(title: "Delete Task?", message: nil) {
+            self.presentOkAlert(title: "Delete Task?", message: nil) {
                 self.viewModel.deleteTask(selectedTask)
             }
         }
@@ -179,7 +179,7 @@ extension ProjectsViewController: UITableViewDataSource, UITableViewDelegate {
         
         let actions = !selectedTask.isCompleted ? [completeAction, updateAction, deleteAction, cancelAction] : [undoCompleteAction, updateAction, deleteAction, cancelAction]
         
-        presentAlert(title: nil, message: nil, style: .actionSheet, actions: actions)
+        presentAlert(style: .actionSheet, actions: actions)
     }
     
 }
@@ -209,7 +209,7 @@ extension ProjectsViewController: ProjectHeaderViewDelegate {
         })
         
         let deleteAction = UIAlertAction(title: "Delete Project", style: .destructive, handler: { [weak self] _ in
-            self?.presentAlert(title: "Delete Project?", message: nil, okHandler: {
+            self?.presentOkAlert(title: "Delete Project?", message: nil, okHandler: {
                 self?.viewModel.deleteProject(project: project)
             })
         })

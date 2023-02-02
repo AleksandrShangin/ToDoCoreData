@@ -34,3 +34,7 @@ extension UIView {
     }
     
 }
+
+struct Constants {
+    static let mainInsets: CGFloat = 8
+}

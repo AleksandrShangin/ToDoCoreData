@@ -9,7 +9,11 @@ import UIKit
 
 final class ProjectsView: UIView {
     
+    //MARK: - Properties
+    
     var tableView: UITableView!
+    
+    //MARK: - Init
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -20,16 +24,23 @@ final class ProjectsView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    //MARK: - Lifecycle
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         setupConstraints()
     }
  
+    //MARK: - Setup
+    
     private func setupSubviews() {
         backgroundColor = .systemBackground
         
         tableView = {
-            let i = UITableView()
+            let i = UITableView(
+                frame: .zero,
+                style: .grouped
+            )
             i.register(ProjectHeaderView.self, forHeaderFooterViewReuseIdentifier: ProjectHeaderView.identifier)
             i.register(TaskTableViewCell.self, forCellReuseIdentifier: TaskTableViewCell.identifier)
             return i

@@ -12,7 +12,6 @@ protocol CategoryCollectionViewCellDelegate: AnyObject {
 }
 
 final class CategoryCollectionViewCell: UICollectionViewCell {
-    
     static let identifier = "CategoryCollectionViewCell"
     
     // MARK: - Properties
@@ -49,7 +48,7 @@ final class CategoryCollectionViewCell: UICollectionViewCell {
         
         titleLabel = {
             let i = UILabel()
-            i.font = .preferredFont(forTextStyle: .largeTitle)
+            i.font = .preferredFont(forTextStyle: .title1)
             return i
         }()
         contentView.addSubview(titleLabel)
@@ -65,13 +64,21 @@ final class CategoryCollectionViewCell: UICollectionViewCell {
     }
     
     private func setupConstraints() {
+        let imageSize: CGFloat = 40
+        
         titleLabel.frame = CGRect(
-            x: 8,
-            y: 8,
+            x: Constants.mainInsets,
+            y: Constants.mainInsets,
             width: contentView.width - 56 - 16,
             height: (contentView.height-16)/2
         )
-        menuButton.frame = CGRect(x: contentView.width-56, y: 8, width: 40, height: 40)
+        
+        menuButton.frame = CGRect(
+            x: contentView.width-56,
+            y: Constants.mainInsets,
+            width: imageSize,
+            height: imageSize
+        )
     }
     
     
