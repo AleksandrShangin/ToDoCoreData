@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		848421CF296761F00029CC10 /* ProjectsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848421CE296761F00029CC10 /* ProjectsDataSource.swift */; };
 		849DB6582928183500313C5F /* CategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849DB6572928183500313C5F /* CategoriesView.swift */; };
 		849DB65A29281BAB00313C5F /* CategoriesRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849DB65929281BAB00313C5F /* CategoriesRouter.swift */; };
 		849DB65C29281BB900313C5F /* BaseRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849DB65B29281BB900313C5F /* BaseRouter.swift */; };
@@ -37,7 +36,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		848421CE296761F00029CC10 /* ProjectsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectsDataSource.swift; sourceTree = "<group>"; };
 		849DB6572928183500313C5F /* CategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesView.swift; sourceTree = "<group>"; };
 		849DB65929281BAB00313C5F /* CategoriesRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesRouter.swift; sourceTree = "<group>"; };
 		849DB65B29281BB900313C5F /* BaseRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseRouter.swift; sourceTree = "<group>"; };
@@ -157,7 +155,6 @@
 				849DB65E292959E400313C5F /* ProjectsView.swift */,
 				FAC944A2262EAE1F00BCADAD /* ProjectsViewController.swift */,
 				FA31F25227D7737C0005929D /* ProjectsViewModel.swift */,
-				848421CE296761F00029CC10 /* ProjectsDataSource.swift */,
 			);
 			path = Tasks;
 			sourceTree = "<group>";
@@ -290,7 +287,6 @@
 				FA9567C3274E5E7B00DF9164 /* Organizer.swift in Sources */,
 				FA31F25327D7737C0005929D /* ProjectsViewModel.swift in Sources */,
 				FA94A206274A98450031DC28 /* UIViewController+Extensions.swift in Sources */,
-				848421CF296761F00029CC10 /* ProjectsDataSource.swift in Sources */,
 				FA56F4A727D757E600B28543 /* SetupFunction.swift in Sources */,
 				FA94A202274A92440031DC28 /* CategoriesViewController.swift in Sources */,
 				84F7284D298BE22E00FAAE24 /* UITableViewCell+Extensions.swift in Sources */,
