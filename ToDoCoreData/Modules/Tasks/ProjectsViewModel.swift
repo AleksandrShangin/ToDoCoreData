@@ -75,7 +75,11 @@ final class ProjectsViewModel: ProjectsViewModelProtocol {
     }
     
     func createNewProject(name: String) {
-        persistenceService.createNewProject(category: category, name: name) { [weak self] result in
+        let newProject = Project(context: persistenceService.context)
+        newProject.category = self.category
+        newProject.name = name
+        
+        persistenceService.insert(object: newProject) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success:
@@ -88,7 +92,7 @@ final class ProjectsViewModel: ProjectsViewModelProtocol {
     
     func updateProject(project: Project, newName: String) {
         project.name = newName
-        persistenceService.updateEntity(entity: project) { [weak self] result in
+        persistenceService.update(entity: project) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success:
@@ -100,7 +104,7 @@ final class ProjectsViewModel: ProjectsViewModelProtocol {
     }
     
     func deleteProject(project: Project) {
-        persistenceService.deleteEntity(entity: project) { [weak self] result in
+        persistenceService.delete(entity: project) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success:
@@ -114,33 +118,26 @@ final class ProjectsViewModel: ProjectsViewModelProtocol {
     // MARK: - Task Methods
     
     func createNewTask(project: Project, name: String) {
-        let task = Task(context: persistenceService.context)
-        task.category = self.category
-        task.project = project
-        task.name = name
-        task.isCompleted = false
+        let newTask = Task(context: persistenceService.context)
+        newTask.category = self.category
+        newTask.project = project
+        newTask.name = name
+        newTask.isCompleted = false
         
-        do {
-            try persistenceService.saveContext()
-            self.fetchProjectsAndTasks()
-        } catch {
-            self.onError.send(error)
+        persistenceService.insert(object: newTask) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success:
+                self.fetchProjectsAndTasks()
+            case .failure(let error):
+                self.onError.send(error)
+            }
         }
-        
-//        persistenceService.createNewTask(
-//            category: category,
-//            project: project,
-//            name: name
-//        ) { [weak self] success in
-//            if success {
-//                self?.fetchProjectsAndTasks()
-//            }
-//        }
     }
     
     func completeTask(_ task: Task) {
         task.isCompleted = true
-        persistenceService.updateEntity(entity: task) { [weak self] result in
+        persistenceService.update(entity: task) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success:
@@ -153,7 +150,7 @@ final class ProjectsViewModel: ProjectsViewModelProtocol {
     
     func undoCompleteTask(_ task: Task) {
         task.isCompleted = false
-        persistenceService.updateEntity(entity: task) { [weak self] result in
+        persistenceService.update(entity: task) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success:
@@ -166,7 +163,7 @@ final class ProjectsViewModel: ProjectsViewModelProtocol {
     
     func updateTask(_ task: Task, newName: String) {
         task.name = newName
-        persistenceService.updateEntity(entity: task) { [weak self] result in
+        persistenceService.update(entity: task) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success:
@@ -178,7 +175,7 @@ final class ProjectsViewModel: ProjectsViewModelProtocol {
     }
     
     func deleteTask(_ task: Task) {
-        persistenceService.deleteEntity(entity: task) { [weak self] result in
+        persistenceService.delete(entity: task) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success:

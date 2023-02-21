@@ -137,8 +137,8 @@ extension ProjectsViewController: UITableViewDataSource, UITableViewDelegate {
         let cell = tableView.dequeueCell(TaskTableViewCell.self, for: indexPath)
         
         let task = viewModel.projects.value[indexPath.section].tasks[indexPath.row]
-        let theTask = TaskViewModel(title: task.name!, isCompleted: task.isCompleted)
-        cell.configure(with: theTask)
+        let model = TaskViewModel(title: task.name!, isCompleted: task.isCompleted)
+        cell.configure(with: model)
         return cell
     }
     

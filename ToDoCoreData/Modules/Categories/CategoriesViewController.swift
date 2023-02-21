@@ -87,7 +87,7 @@ final class CategoriesViewController: UIViewController {
     @objc private func didTapAdd() {
         presentAddAlert(title: "New Category", updateName: nil) { [weak self] name in
             guard let self = self else { return }
-            self.viewModel.addNewCategory(name: name)
+            self.viewModel.createCategory(name: name)
         }
     }
 

@@ -13,7 +13,7 @@ protocol CategoriesViewModelProtocol {
     var onError: PassthroughSubject<Error, Never> { get }
     
     func fetchCategories()
-    func addNewCategory(name: String)
+    func createCategory(name: String)
     func delete(_ category: Category)
     func update(_ category: Category, newName: String)
 }
@@ -38,6 +38,21 @@ final class CategoriesViewModel: CategoriesViewModelProtocol {
     
     //MARK: - Public Methods
     
+    func createCategory(name: String) {
+        let newCategory = Category(context: persistenceService.context)
+        newCategory.name = name
+        
+        persistenceService.insert(object: newCategory) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success:
+                self.fetchCategories()
+            case .failure(let error):
+                self.onError.send(error)
+            }
+        }
+    }
+    
     func fetchCategories() {
         self.persistenceService.fetch(entity: Category.self)
             .sink { [weak self] completion in
@@ -55,20 +70,8 @@ final class CategoriesViewModel: CategoriesViewModelProtocol {
             .store(in: &self.subscriptions)
     }
     
-    func addNewCategory(name: String) {
-        persistenceService.createCategory(name: name) { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success:
-                self.fetchCategories()
-            case .failure(let error):
-                self.onError.send(error)
-            }
-        }
-    }
-    
     func delete(_ category: Category) {
-        persistenceService.deleteEntity(entity: category) { [weak self] result in
+        persistenceService.delete(entity: category) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success:
@@ -81,7 +84,7 @@ final class CategoriesViewModel: CategoriesViewModelProtocol {
     
     func update(_ category: Category, newName: String) {
         category.name = newName
-        persistenceService.updateEntity(entity: category) { [weak self] result in
+        persistenceService.update(entity: category) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success:

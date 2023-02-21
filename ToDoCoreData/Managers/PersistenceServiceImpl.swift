@@ -9,30 +9,6 @@ import Foundation
 import CoreData
 import Combine
 
-protocol PersistenceService {
-    var context: NSManagedObjectContext { get }
-    func saveContext() throws
-    // Generic Combine Methods
-    func fetch<T: NSManagedObject>(entity: T.Type) -> AnyPublisher<[T], Error>
-    func fetch<T: NSManagedObject>(entity: T.Type, predicate: NSPredicate) -> AnyPublisher<[T], Error>
-    func delete<T: NSManagedObject>(entity: T) -> AnyPublisher<Void, Error>
-    func delete<T: NSManagedObject>(entities: [T]) -> AnyPublisher<Void, Error>
-    // Generic Closure Methods
-    func fetch<T: NSManagedObject>(entity: T.Type, completion: (Result<[T], Error>) -> Void)
-    func fetch<T: NSManagedObject>(entity: T.Type, predicate: NSPredicate, completion: (Result<[T], Error>) -> Void)
-    func deleteEntity<T: NSManagedObject>(entity: T, completion: (Result<Void, Error>) -> Void)
-    func delete<T: NSManagedObject>(entity: T, predicate: NSPredicate, completion: (Result<Void, Error>) -> Void)
-    func createEntity(object: NSManagedObject, completion: (Result<Void, Error>) -> Void)
-    
-    func updateEntity<T: NSManagedObject>(entity: T, completion: (Result<Void, Error>) -> Void)
-    
-    // Categories
-    func createCategory(name: String, completion: (Result<Void, Error>) -> Void)
-    // Projects
-    func createNewProject(category: Category, name: String, completion: (Result<Void, Error>) -> Void)
-    // Tasks
-    func createNewTask(category: Category, project: Project, name: String, completion: (Bool) -> Void)
-}
 
 final class PersistenceServiceImpl: PersistenceService {
     
@@ -41,7 +17,7 @@ final class PersistenceServiceImpl: PersistenceService {
     private init() {}
     
     // MARK: - Core Data stack
-
+    
     private lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "ToDoCoreData")
         container.loadPersistentStores(completionHandler: { storeDescription, error in
@@ -52,11 +28,11 @@ final class PersistenceServiceImpl: PersistenceService {
         return container
     }()
     
-    lazy var context = persistentContainer.viewContext
-
+    private(set) lazy var context = persistentContainer.viewContext
+    
     // MARK: - Core Data Saving support
-
-    func saveContext() throws {
+    
+     private func save() throws {
         if context.hasChanges {
             do {
                 try context.save()
@@ -104,7 +80,7 @@ final class PersistenceServiceImpl: PersistenceService {
             guard let self = self else { return }
             self.context.delete(entity)
             do {
-                try self.context.save()
+                try self.save()
                 promise(.success(()))
             } catch {
                 promise(.failure(error))
@@ -112,13 +88,13 @@ final class PersistenceServiceImpl: PersistenceService {
         }
         .eraseToAnyPublisher()
     }
-
+    
     func delete<T: NSManagedObject>(entities: [T]) -> AnyPublisher<Void, Error> {
         return Future { [weak self] promise in
             guard let self = self else { return }
             entities.forEach { self.context.delete($0) }
             do {
-                try self.context.save()
+                try self.save()
                 promise(.success(()))
             } catch {
                 promise(.failure(error))
@@ -127,17 +103,17 @@ final class PersistenceServiceImpl: PersistenceService {
         .eraseToAnyPublisher()
     }
     
+    // MARK: - Generic Closure Methods
+    
     func insert(object: NSManagedObject, completion: (Result<Void, Error>) -> Void) {
         context.insert(object)
         do {
-            try saveContext()
+            try self.save()
             completion(.success(()))
         } catch {
             completion(.failure(error))
         }
     }
-    
-    // MARK: - Generic Closure Methods
     
     func fetch<T: NSManagedObject>(entity: T.Type, completion: (Result<[T], Error>) -> Void) {
         let request = NSFetchRequest<T>(entityName: String(describing: T.self))
@@ -160,81 +136,25 @@ final class PersistenceServiceImpl: PersistenceService {
         }
     }
     
-    func deleteEntity<T: NSManagedObject>(entity: T, completion: (Result<Void, Error>) -> Void) {
+    func update(entity: NSManagedObject, completion: (Result<Void, Error>) -> Void) {
+        do {
+            try self.save()
+            completion(.success(()))
+        } catch {
+            completion(.failure(error))
+        }
+    }
+    
+    func delete(entity: NSManagedObject, completion: (Result<Void, Error>) -> Void) {
         context.delete(entity)
         do {
-            try context.save()
+            try self.save()
             completion(.success(()))
         } catch {
             completion(.failure(error))
         }
     }
     
-    func delete<T: NSManagedObject>(entity: T, predicate: NSPredicate, completion: (Result<Void, Error>) -> Void) {
-        
-    }
-    
-    func updateEntity<T: NSManagedObject>(entity: T, completion: (Result<Void, Error>) -> Void) {
-        do {
-            try context.save()
-            completion(.success(()))
-        } catch {
-            completion(.failure(error))
-        }
-    }
-    
-    func createEntity(object: NSManagedObject, completion: (Result<Void, Error>) -> Void) {
-//        let i = object(context: context)
-    }
-    
-    // MARK: - Category Methods
-    
-    func createCategory(name: String, completion: (Result<Void, Error>) -> Void) {
-        let category = Category(context: context)
-        category.name = name
-        do {
-            try context.save()
-            completion(.success(()))
-        } catch {
-            completion(.failure(error))
-        }
-    }
-    
-    // MARK: - Projects Methods
-    
-    func createNewProject(category: Category, name: String, completion: (Result<Void, Error>) -> Void) {
-        let newProject = Project(context: context)
-        newProject.name = name
-        newProject.category = category
-        do {
-            try context.save()
-            completion(.success(()))
-        } catch {
-            completion(.failure(error))
-        }
-    }
-    
-    // MARK: - Task Methods
-    
-    func createNewTask(category: Category, project: Project, name: String, completion: (Bool) -> Void) {
-        let newTask = Task(context: context)
-        newTask.name = name
-        newTask.isCompleted = false
-        newTask.category = category
-        newTask.project = project
-        do {
-            let tasks = try context.fetch(Task.fetchRequest())
-            newTask.index = Int64(tasks.count-1)
-        } catch {
-            print("Could not fetch Core Data entities: \(error)")
-        }
-        do {
-            try context.save()
-            completion(true)
-        } catch {
-            print(error.localizedDescription)
-            completion(false)
-        }
-    }
+    func delete<T: NSManagedObject>(entity: T, predicate: NSPredicate, completion: (Result<Void, Error>) -> Void) {}
     
 }

@@ -55,8 +55,14 @@ extension UIViewController {
     }
     
     /// Base Add Alert
-    func presentAddAlert(title: String, message: String? = nil, updateName: String?, okHandler: @escaping (String) -> Void) {
+    func presentAddAlert(
+        title: String,
+        message: String? = nil,
+        updateName: String?,
+        okHandler: @escaping (String) -> Void
+    ) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        
         alert.addTextField { textField in
             textField.autocapitalizationType = .words
             guard let updateName = updateName else {
@@ -69,6 +75,7 @@ extension UIViewController {
             okHandler(text)
         })
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        
         present(alert, animated: true)
     }
     
