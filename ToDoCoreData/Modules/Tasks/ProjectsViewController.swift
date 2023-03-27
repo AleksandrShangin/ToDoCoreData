@@ -172,23 +172,23 @@ extension ProjectsViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let header = tableView.dequeueView(ProjectHeaderView.self)
         
-        let title = viewModel.projects.value[section].project.name
+        let projectName = viewModel.projects.value[section].project.name
         header.tag = section
-        header.configure(with: title ?? "Other")
+        header.configure(with: projectName)
         header.delegate = self
         return header
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let project = viewModel.projects.value[section].project
-        return project.tasks?.count ?? 0
+        return project.tasks.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueCell(TaskTableViewCell.self, for: indexPath)
         
         let task = viewModel.projects.value[indexPath.section].tasks[indexPath.row]
-        let model = TaskViewModel(title: task.name!, isCompleted: task.isCompleted)
+        let model = TaskViewModel(title: task.name, isCompleted: task.isCompleted)
         cell.configure(with: model)
         return cell
     }

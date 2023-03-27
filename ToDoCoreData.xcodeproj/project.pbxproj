@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8472F52D29D1D41F004FFC04 /* Project+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8472F52729D1D41F004FFC04 /* Project+CoreDataClass.swift */; };
+		8472F52E29D1D41F004FFC04 /* Project+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8472F52829D1D41F004FFC04 /* Project+CoreDataProperties.swift */; };
+		8472F52F29D1D41F004FFC04 /* Task+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8472F52929D1D41F004FFC04 /* Task+CoreDataClass.swift */; };
+		8472F53029D1D41F004FFC04 /* Task+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8472F52A29D1D41F004FFC04 /* Task+CoreDataProperties.swift */; };
+		8472F53129D1D41F004FFC04 /* Category+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8472F52B29D1D41F004FFC04 /* Category+CoreDataClass.swift */; };
+		8472F53229D1D41F004FFC04 /* Category+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8472F52C29D1D41F004FFC04 /* Category+CoreDataProperties.swift */; };
 		849DB6582928183500313C5F /* CategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849DB6572928183500313C5F /* CategoriesView.swift */; };
 		849DB65A29281BAB00313C5F /* CategoriesRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849DB65929281BAB00313C5F /* CategoriesRouter.swift */; };
 		849DB65C29281BB900313C5F /* BaseRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849DB65B29281BB900313C5F /* BaseRouter.swift */; };
@@ -39,6 +45,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		8472F52729D1D41F004FFC04 /* Project+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Project+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
+		8472F52829D1D41F004FFC04 /* Project+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Project+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
+		8472F52929D1D41F004FFC04 /* Task+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Task+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
+		8472F52A29D1D41F004FFC04 /* Task+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Task+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
+		8472F52B29D1D41F004FFC04 /* Category+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Category+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
+		8472F52C29D1D41F004FFC04 /* Category+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Category+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
 		849DB6572928183500313C5F /* CategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesView.swift; sourceTree = "<group>"; };
 		849DB65929281BAB00313C5F /* CategoriesRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesRouter.swift; sourceTree = "<group>"; };
 		849DB65B29281BB900313C5F /* BaseRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseRouter.swift; sourceTree = "<group>"; };
@@ -205,6 +217,12 @@
 		FA94A207274A9FEC0031DC28 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				8472F52729D1D41F004FFC04 /* Project+CoreDataClass.swift */,
+				8472F52829D1D41F004FFC04 /* Project+CoreDataProperties.swift */,
+				8472F52929D1D41F004FFC04 /* Task+CoreDataClass.swift */,
+				8472F52A29D1D41F004FFC04 /* Task+CoreDataProperties.swift */,
+				8472F52B29D1D41F004FFC04 /* Category+CoreDataClass.swift */,
+				8472F52C29D1D41F004FFC04 /* Category+CoreDataProperties.swift */,
 				FA9567C2274E5E7B00DF9164 /* Organizer.swift */,
 			);
 			path = Models;
@@ -308,18 +326,24 @@
 				FA332CD8273560D70053FB0F /* PersistenceServiceImpl.swift in Sources */,
 				849DB65A29281BAB00313C5F /* CategoriesRouter.swift in Sources */,
 				84F72853298BE4AC00FAAE24 /* UICollectionView+Extensions.swift in Sources */,
+				8472F53029D1D41F004FFC04 /* Task+CoreDataProperties.swift in Sources */,
 				84CD8EE9292A867D0041682B /* CategoryCollectionViewCell.swift in Sources */,
+				8472F52F29D1D41F004FFC04 /* Task+CoreDataClass.swift in Sources */,
 				849DB65C29281BB900313C5F /* BaseRouter.swift in Sources */,
+				8472F52D29D1D41F004FFC04 /* Project+CoreDataClass.swift in Sources */,
 				849DB6582928183500313C5F /* CategoriesView.swift in Sources */,
 				FA9567C3274E5E7B00DF9164 /* Organizer.swift in Sources */,
 				FA31F25327D7737C0005929D /* ProjectsViewModel.swift in Sources */,
 				FA94A206274A98450031DC28 /* UIViewController+Alert.swift in Sources */,
 				84FD8B6C29D188020083A1E4 /* Factory.swift in Sources */,
+				8472F53129D1D41F004FFC04 /* Category+CoreDataClass.swift in Sources */,
 				FA56F4A727D757E600B28543 /* SetupFunction.swift in Sources */,
 				FA94A202274A92440031DC28 /* CategoriesViewController.swift in Sources */,
+				8472F53229D1D41F004FFC04 /* Category+CoreDataProperties.swift in Sources */,
 				84F7284D298BE22E00FAAE24 /* UITableViewCell+Extensions.swift in Sources */,
 				84F72855298BF31600FAAE24 /* UITableViewHeaderFooterView+Extensions.swift in Sources */,
 				FA9567C6274E634C00DF9164 /* CategoriesViewModel.swift in Sources */,
+				8472F52E29D1D41F004FFC04 /* Project+CoreDataProperties.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
