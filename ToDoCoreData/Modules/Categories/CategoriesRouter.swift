@@ -10,8 +10,7 @@ import Foundation
 class CategoriesRouter: BaseRouter {
     
     func showTasks(of category: Category) {
-        let tasksViewModel = ProjectsViewModel(category: category)
-        let projectsViewController = ProjectsViewController(viewModel: tasksViewModel)
+        let projectsViewController = ProjectsFactory(category: category).build()
         projectsViewController.title = category.name ?? "No Category"
         viewController.navigationController?.pushViewController(projectsViewController, animated: true)
     }

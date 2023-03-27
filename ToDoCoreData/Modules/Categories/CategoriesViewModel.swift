@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-protocol CategoriesViewModelProtocol {
+protocol CategoriesViewModel {
     var categories: CurrentValueSubject<[Category], Never> { get }
     var onError: PassthroughSubject<Error, Never> { get }
     
@@ -18,7 +18,7 @@ protocol CategoriesViewModelProtocol {
     func rename(_ category: Category, with newName: String)
 }
 
-final class CategoriesViewModel: CategoriesViewModelProtocol {
+final class CategoriesViewModelImpl: CategoriesViewModel {
     
     //MARK: - Public Properties
     
@@ -32,7 +32,7 @@ final class CategoriesViewModel: CategoriesViewModelProtocol {
     
     //MARK: - Init
     
-    init(persistenceService: PersistenceService = PersistenceServiceImpl.shared) {
+    init(persistenceService: PersistenceService) {
         self.persistenceService = persistenceService
     }
     

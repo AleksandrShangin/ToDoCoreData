@@ -15,8 +15,19 @@ final class CategoriesViewController: UIViewController {
     weak var collectionView: UICollectionView!
     
     private var router: CategoriesRouter!
-    private let viewModel = CategoriesViewModel()
+    private let viewModel: CategoriesViewModel
     private var subscriptions = Set<AnyCancellable>()
+    
+    // MARK: - Init
+    
+    init(viewModel: CategoriesViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - Lifecycle
     
@@ -173,7 +184,7 @@ extension CategoriesViewController: CategoryCollectionViewCellDelegate {
             assertionFailure("Index must be set")
             return
         }
-        let selectedCategory = viewModel.categories.value[index.row]
+        let selectedCategory = viewModel.categories.value[index.item]
         
         self.didTapMenu(selectedCategory)
     }

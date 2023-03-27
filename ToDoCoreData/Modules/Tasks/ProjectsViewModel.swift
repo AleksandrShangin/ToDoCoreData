@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-protocol ProjectsViewModelProtocol {
+protocol ProjectsViewModel {
     var projects: CurrentValueSubject<[Organizer], Never> { get }
     var onError: PassthroughSubject<Error, Never> { get }
     
@@ -25,7 +25,7 @@ protocol ProjectsViewModelProtocol {
     func deleteTask(_ task: Task)
 }
 
-final class ProjectsViewModel: ProjectsViewModelProtocol {
+final class ProjectsViewModelImpl: ProjectsViewModel {
     
     //MARK: - Public Properties
     
@@ -40,7 +40,7 @@ final class ProjectsViewModel: ProjectsViewModelProtocol {
     
     //MARK: - Init
     
-    init(category: Category, persistenceService: PersistenceService = PersistenceServiceImpl.shared) {
+    init(category: Category, persistenceService: PersistenceService) {
         self.category = category
         self.persistenceService = persistenceService
     }

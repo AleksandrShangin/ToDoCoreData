@@ -18,6 +18,9 @@
 		84F72851298BE30A00FAAE24 /* UITableView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F72850298BE30A00FAAE24 /* UITableView+Extensions.swift */; };
 		84F72853298BE4AC00FAAE24 /* UICollectionView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F72852298BE4AC00FAAE24 /* UICollectionView+Extensions.swift */; };
 		84F72855298BF31600FAAE24 /* UITableViewHeaderFooterView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F72854298BF31600FAAE24 /* UITableViewHeaderFooterView+Extensions.swift */; };
+		84FD8B6C29D188020083A1E4 /* Factory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84FD8B6B29D188020083A1E4 /* Factory.swift */; };
+		84FD8B6E29D189260083A1E4 /* CategoriesFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84FD8B6D29D189260083A1E4 /* CategoriesFactory.swift */; };
+		84FD8B7029D18A6E0083A1E4 /* ProjectsFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84FD8B6F29D18A6E0083A1E4 /* ProjectsFactory.swift */; };
 		FA31F24F27D75E890005929D /* ProjectHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA31F24E27D75E890005929D /* ProjectHeaderView.swift */; };
 		FA31F25127D766240005929D /* TaskTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA31F25027D766230005929D /* TaskTableViewCell.swift */; };
 		FA31F25327D7737C0005929D /* ProjectsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA31F25227D7737C0005929D /* ProjectsViewModel.swift */; };
@@ -47,6 +50,9 @@
 		84F72850298BE30A00FAAE24 /* UITableView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITableView+Extensions.swift"; sourceTree = "<group>"; };
 		84F72852298BE4AC00FAAE24 /* UICollectionView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UICollectionView+Extensions.swift"; sourceTree = "<group>"; };
 		84F72854298BF31600FAAE24 /* UITableViewHeaderFooterView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITableViewHeaderFooterView+Extensions.swift"; sourceTree = "<group>"; };
+		84FD8B6B29D188020083A1E4 /* Factory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Factory.swift; sourceTree = "<group>"; };
+		84FD8B6D29D189260083A1E4 /* CategoriesFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesFactory.swift; sourceTree = "<group>"; };
+		84FD8B6F29D18A6E0083A1E4 /* ProjectsFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectsFactory.swift; sourceTree = "<group>"; };
 		FA31F24E27D75E890005929D /* ProjectHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectHeaderView.swift; sourceTree = "<group>"; };
 		FA31F25027D766230005929D /* TaskTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskTableViewCell.swift; sourceTree = "<group>"; };
 		FA31F25227D7737C0005929D /* ProjectsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectsViewModel.swift; sourceTree = "<group>"; };
@@ -93,6 +99,15 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		84FD8B6A29D187F50083A1E4 /* Base */ = {
+			isa = PBXGroup;
+			children = (
+				84FD8B6B29D188020083A1E4 /* Factory.swift */,
+				849DB65B29281BB900313C5F /* BaseRouter.swift */,
+			);
+			path = Base;
+			sourceTree = "<group>";
+		};
 		FA37BCD2253CA1D700BCB101 = {
 			isa = PBXGroup;
 			children = (
@@ -113,6 +128,7 @@
 			isa = PBXGroup;
 			children = (
 				FA37BCDE253CA1D700BCB101 /* AppDelegate.swift */,
+				84FD8B6A29D187F50083A1E4 /* Base */,
 				FA56F4A527D757D600B28543 /* Helpers */,
 				FA9567BF274E5AEC00DF9164 /* Extensions */,
 				FA94A203274A95830031DC28 /* Managers */,
@@ -130,7 +146,6 @@
 			isa = PBXGroup;
 			children = (
 				FA56F4A627D757E600B28543 /* SetupFunction.swift */,
-				849DB65B29281BB900313C5F /* BaseRouter.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -152,6 +167,7 @@
 				FA94A201274A92440031DC28 /* CategoriesViewController.swift */,
 				FA9567C5274E634C00DF9164 /* CategoriesViewModel.swift */,
 				849DB65929281BAB00313C5F /* CategoriesRouter.swift */,
+				84FD8B6D29D189260083A1E4 /* CategoriesFactory.swift */,
 			);
 			path = Categories;
 			sourceTree = "<group>";
@@ -163,6 +179,7 @@
 				849DB65E292959E400313C5F /* ProjectsView.swift */,
 				FAC944A2262EAE1F00BCADAD /* ProjectsViewController.swift */,
 				FA31F25227D7737C0005929D /* ProjectsViewModel.swift */,
+				84FD8B6F29D18A6E0083A1E4 /* ProjectsFactory.swift */,
 			);
 			path = Tasks;
 			sourceTree = "<group>";
@@ -284,7 +301,9 @@
 				FA37BCE9253CA1D700BCB101 /* ToDoCoreData.xcdatamodeld in Sources */,
 				FAC944A3262EAE1F00BCADAD /* ProjectsViewController.swift in Sources */,
 				FA9567C1274E5B0700DF9164 /* UIView+Extensions.swift in Sources */,
+				84FD8B6E29D189260083A1E4 /* CategoriesFactory.swift in Sources */,
 				84F72851298BE30A00FAAE24 /* UITableView+Extensions.swift in Sources */,
+				84FD8B7029D18A6E0083A1E4 /* ProjectsFactory.swift in Sources */,
 				849DB65F292959E400313C5F /* ProjectsView.swift in Sources */,
 				FA332CD8273560D70053FB0F /* PersistenceServiceImpl.swift in Sources */,
 				849DB65A29281BAB00313C5F /* CategoriesRouter.swift in Sources */,
@@ -295,6 +314,7 @@
 				FA9567C3274E5E7B00DF9164 /* Organizer.swift in Sources */,
 				FA31F25327D7737C0005929D /* ProjectsViewModel.swift in Sources */,
 				FA94A206274A98450031DC28 /* UIViewController+Alert.swift in Sources */,
+				84FD8B6C29D188020083A1E4 /* Factory.swift in Sources */,
 				FA56F4A727D757E600B28543 /* SetupFunction.swift in Sources */,
 				FA94A202274A92440031DC28 /* CategoriesViewController.swift in Sources */,
 				84F7284D298BE22E00FAAE24 /* UITableViewCell+Extensions.swift in Sources */,
