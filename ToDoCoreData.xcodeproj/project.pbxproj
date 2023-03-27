@@ -85,6 +85,14 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		84FD8B6929D1877E0083A1E4 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				FA37BCEA253CA1DD00BCB101 /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		FA37BCD2253CA1D700BCB101 = {
 			isa = PBXGroup;
 			children = (
@@ -110,7 +118,7 @@
 				FA94A203274A95830031DC28 /* Managers */,
 				FA94A207274A9FEC0031DC28 /* Models */,
 				FA56F4A827D75A2E00B28543 /* Modules */,
-				FA37BCEA253CA1DD00BCB101 /* Assets.xcassets */,
+				84FD8B6929D1877E0083A1E4 /* Resources */,
 				FA37BCEC253CA1DD00BCB101 /* LaunchScreen.storyboard */,
 				FA37BCEF253CA1DD00BCB101 /* Info.plist */,
 				FA37BCE7253CA1D700BCB101 /* ToDoCoreData.xcdatamodeld */,
