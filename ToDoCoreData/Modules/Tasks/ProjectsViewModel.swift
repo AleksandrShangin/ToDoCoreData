@@ -21,7 +21,7 @@ protocol ProjectsViewModelProtocol {
     func createNewTask(project: Project, name: String)
     func completeTask(_ task: Task)
     func undoCompleteTask(_ task: Task)
-    func updateTask(_ task: Task, newName: String)
+    func renameTask(_ task: Task, with newName: String)
     func deleteTask(_ task: Task)
 }
 
@@ -161,7 +161,7 @@ final class ProjectsViewModel: ProjectsViewModelProtocol {
         }
     }
     
-    func updateTask(_ task: Task, newName: String) {
+    func renameTask(_ task: Task, with newName: String) {
         task.name = newName
         persistenceService.update(entity: task) { [weak self] result in
             guard let self = self else { return }

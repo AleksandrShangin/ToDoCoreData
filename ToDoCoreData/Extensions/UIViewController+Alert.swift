@@ -1,5 +1,5 @@
 //
-//  UIViewController+Extensions.swift
+//  UIViewController+Alert.swift
 //  ToDoCoreData
 //
 //  Created by Alex on 11/21/21.
@@ -13,8 +13,8 @@ extension UIViewController {
     func presentAlert(
         title: String? = nil,
         message: String? = nil,
-        style: UIAlertController.Style,
-        actions: [UIAlertAction]
+        actions: [UIAlertAction],
+        style: UIAlertController.Style = .alert
     ) {
         let alertController = UIAlertController(
             title: title,
@@ -32,7 +32,6 @@ extension UIViewController {
         presentAlert(
             title: "Error",
             message: message,
-            style: .alert,
             actions: [
                 UIAlertAction(title: "OK", style: .cancel)
             ]
@@ -44,7 +43,6 @@ extension UIViewController {
         presentAlert(
             title: title,
             message: message,
-            style: .alert,
             actions: [
                 UIAlertAction(title: "OK", style: .default) { _ in
                     okHandler()

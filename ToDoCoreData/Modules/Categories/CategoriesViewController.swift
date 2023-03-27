@@ -35,7 +35,7 @@ final class CategoriesViewController: UIViewController {
         configureBindings()
     }
     
-    // MARK: - Setup
+    // MARK: - Configure
     
     private func configureRouter() {
         router = CategoriesRouter(viewController: self)
@@ -90,6 +90,29 @@ final class CategoriesViewController: UIViewController {
             self.viewModel.createCategory(name: name)
         }
     }
+    
+    private func didSelectCategory(_ selectedCategory: Category) {
+        self.router.showTasks(of: selectedCategory)
+    }
+    
+    private func didTapMenu(_ selectedCategory: Category) {
+        self.presentAlert(
+            actions: [
+                UIAlertAction(title: "Rename Category", style: .default) { [weak self] _ in
+                    self?.presentAddAlert(title: "Rename Category", message: nil, updateName: selectedCategory.name) { newName in
+                        self?.viewModel.rename(selectedCategory, with: newName)
+                    }
+                },
+                UIAlertAction(title: "Delete Category", style: .destructive) { [weak self] _ in
+                    self?.presentOkAlert(title: "Delete Category?", message: selectedCategory.name, okHandler: {
+                        self?.viewModel.delete(selectedCategory)
+                    })
+                },
+                UIAlertAction(title: "Cancel", style: .cancel)
+            ],
+            style: .actionSheet
+        )
+    }
 
 }
 
@@ -123,7 +146,7 @@ extension CategoriesViewController: UICollectionViewDelegate, UICollectionViewDe
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: true)
         let selectedCategory = viewModel.categories.value[indexPath.row]
-        router.showTasks(of: selectedCategory)
+        self.didSelectCategory(selectedCategory)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -145,26 +168,14 @@ extension CategoriesViewController: UICollectionViewDelegate, UICollectionViewDe
 
 extension CategoriesViewController: CategoryCollectionViewCellDelegate {
     
-    func didTapMenu(_ cell: CategoryCollectionViewCell) {
+    func didTapMenuButton(_ cell: CategoryCollectionViewCell) {
         guard let index = collectionView.indexPath(for: cell) else {
             assertionFailure("Index must be set")
             return
         }
         let selectedCategory = viewModel.categories.value[index.row]
         
-        let renameAction = UIAlertAction(title: "Rename Category", style: .default) { [weak self] _ in
-            self?.presentAddAlert(title: "Rename Category", message: nil, updateName: selectedCategory.name) { newName in
-                self?.viewModel.update(selectedCategory, newName: newName)
-            }
-        }
-        let deleteAction = UIAlertAction(title: "Delete Category", style: .destructive) { [weak self] _ in
-            self?.presentOkAlert(title: "Delete Category?", message: nil, okHandler: {
-                self?.viewModel.delete(selectedCategory)
-            })
-        }
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
-        
-        presentAlert(style: .actionSheet, actions: [renameAction, deleteAction, cancelAction])
+        self.didTapMenu(selectedCategory)
     }
     
 }

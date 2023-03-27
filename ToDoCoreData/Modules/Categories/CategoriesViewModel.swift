@@ -15,7 +15,7 @@ protocol CategoriesViewModelProtocol {
     func fetchCategories()
     func createCategory(name: String)
     func delete(_ category: Category)
-    func update(_ category: Category, newName: String)
+    func rename(_ category: Category, with newName: String)
 }
 
 final class CategoriesViewModel: CategoriesViewModelProtocol {
@@ -82,7 +82,7 @@ final class CategoriesViewModel: CategoriesViewModelProtocol {
         }
     }
     
-    func update(_ category: Category, newName: String) {
+    func rename(_ category: Category, with newName: String) {
         category.name = newName
         persistenceService.update(entity: category) { [weak self] result in
             guard let self = self else { return }

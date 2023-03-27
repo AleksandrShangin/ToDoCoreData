@@ -8,7 +8,7 @@
 import UIKit
 
 protocol CategoryCollectionViewCellDelegate: AnyObject {
-    func didTapMenu(_ cell: CategoryCollectionViewCell)
+    func didTapMenuButton(_ cell: CategoryCollectionViewCell)
 }
 
 final class CategoryCollectionViewCell: UICollectionViewCell {
@@ -84,7 +84,7 @@ final class CategoryCollectionViewCell: UICollectionViewCell {
     // MARK: - Actions
     
     @objc private func didTapMenu() {
-        delegate?.didTapMenu(self)
+        delegate?.didTapMenuButton(self)
     }
     
     // MARK: - Configure

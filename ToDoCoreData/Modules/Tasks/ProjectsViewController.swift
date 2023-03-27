@@ -93,20 +93,77 @@ final class ProjectsViewController: UIViewController {
     
     // MARK: - Actions
     
-    @objc func didTapAddButton() {
+    @objc
+    private func didTapAddButton() {
         presentAddAlert(title: "New Project", updateName: nil) { [weak self] name in
             guard let self = self else { return }
             self.viewModel.createNewProject(name: name)
         }
     }
+    
+    private func didTapMenu(project: Project) {
+        self.presentAlert(
+            actions: [
+                UIAlertAction(title: "Add New Task", style: .default) { [weak self] _ in
+                    guard let self = self else { return }
+                    self.presentAddAlert(title: "New Task", updateName: nil) { taskName in
+                        self.viewModel.createNewTask(project: project, name: taskName)
+                    }
+                },
+                UIAlertAction(title: "Rename Project", style: .default) { [weak self] _ in
+                    self?.presentAddAlert(title: "Rename Project", message: nil, updateName: project.name) { newName in
+                        self?.viewModel.updateProject(project: project, newName: newName)
+                    }
+                },
+                UIAlertAction(title: "Delete Project", style: .destructive) { [weak self] _ in
+                    self?.presentOkAlert(title: "Delete Project?", message: project.name, okHandler: {
+                        self?.viewModel.deleteProject(project: project)
+                    })
+                },
+                UIAlertAction(title: "Cancel", style: .cancel)
+            ],
+            style: .actionSheet
+        )
+    }
+    
+    private func didSelectTask(_ selectedTask: Task) {
+        let undoCompleteAction = UIAlertAction(title: "Undo Complete", style: .default) { [weak self] _ in
+            guard let self = self else { return }
+            self.presentOkAlert(title: "Undo Complete?") {
+                self.viewModel.undoCompleteTask(selectedTask)
+            }
+        }
+        
+        let completeAction = UIAlertAction(title: "Complete Task", style: .default) { [weak self] _ in
+            guard let self = self else { return }
+            self.viewModel.completeTask(selectedTask)
+        }
+        let updateAction = UIAlertAction(title: "Rename Task", style: .default) { [weak self] _ in
+            guard let self = self else { return }
+            self.presentAddAlert(title: "Rename Task", message: nil, updateName: selectedTask.name) { newName in
+                self.viewModel.renameTask(selectedTask, with: newName)
+            }
+        }
+        
+        let deleteAction = UIAlertAction(title: "Delete Task", style: .destructive) { [weak self] _ in
+            guard let self = self else { return }
+            self.presentOkAlert(title: "Delete Task?", message: selectedTask.name) {
+                self.viewModel.deleteTask(selectedTask)
+            }
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        
+        let actions = !selectedTask.isCompleted ? [completeAction, updateAction, deleteAction, cancelAction] : [undoCompleteAction, updateAction, deleteAction, cancelAction]
+        
+        presentAlert(actions: actions, style: .actionSheet)
+    }
 
 }
 
-// MARK: - TableView Methods
+// MARK: - Extension For UITableViewDataSource
 
-extension ProjectsViewController: UITableViewDataSource, UITableViewDelegate {
-
-    // Sections
+extension ProjectsViewController: UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return viewModel.projects.value.count
@@ -122,12 +179,6 @@ extension ProjectsViewController: UITableViewDataSource, UITableViewDelegate {
         return header
     }
     
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 44
-    }
-    
-    // Rows
-    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let project = viewModel.projects.value[section].project
         return project.tasks?.count ?? 0
@@ -142,77 +193,33 @@ extension ProjectsViewController: UITableViewDataSource, UITableViewDelegate {
         return cell
     }
     
+}
+
+
+// MARK: - Extension For UITableViewDelegate
+
+extension ProjectsViewController: UITableViewDelegate {
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let selectedTask = viewModel.projects.value[indexPath.section].tasks[indexPath.row]
-        
-        let undoCompleteAction = UIAlertAction(title: "Undo Complete", style: .default) { [weak self] _ in
-            guard let self = self else { return }
-            self.presentOkAlert(title: "Undo Complete?") {
-                self.viewModel.undoCompleteTask(selectedTask)
-            }
-        }
-        
-        let completeAction = UIAlertAction(title: "Complete Task", style: .default) { [weak self] _ in
-            guard let self = self else { return }
-            self.viewModel.completeTask(selectedTask)
-        }
-        let updateAction = UIAlertAction(title: "Update Task", style: .default) { [weak self] _ in
-            guard let self = self else { return }
-            self.presentAddAlert(title: "Update Task", message: nil, updateName: selectedTask.name) { newName in
-                self.viewModel.updateTask(selectedTask, newName: newName)
-            }
-        }
-        
-        let deleteAction = UIAlertAction(title: "Delete Task", style: .destructive) { [weak self] _ in
-            guard let self = self else { return }
-            self.presentOkAlert(title: "Delete Task?", message: nil) {
-                self.viewModel.deleteTask(selectedTask)
-            }
-        }
-        
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
-        
-        let actions = !selectedTask.isCompleted ? [completeAction, updateAction, deleteAction, cancelAction] : [undoCompleteAction, updateAction, deleteAction, cancelAction]
-        
-        presentAlert(style: .actionSheet, actions: actions)
+        self.didSelectTask(selectedTask)
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 44
     }
     
 }
 
+
 // MARK: - Extension For ProjectHeaderViewDelegate
 
 extension ProjectsViewController: ProjectHeaderViewDelegate {
-    
-    func didTapAddTask(_ view: ProjectHeaderView) {
+    func didTapMenuButton(_ view: ProjectHeaderView) {
         let section = view.tag
         let project = viewModel.projects.value[section].project
-        presentActionSheet(section: section, project: project)
+        self.didTapMenu(project: project)
     }
-    
-    func presentActionSheet(section: Int, project: Project) {
-        let addAction = UIAlertAction(title: "Add New Task", style: .default, handler: { [weak self] _ in
-            guard let self = self else { return }
-            self.presentAddAlert(title: "New Task", updateName: nil) { taskName in
-                self.viewModel.createNewTask(project: project, name: taskName)
-            }
-        })
-        
-        let updateAction = UIAlertAction(title: "Update Project", style: .default, handler: { [weak self] _ in
-            self?.presentAddAlert(title: "Update Project", message: nil, updateName: project.name) { newName in
-                self?.viewModel.updateProject(project: project, newName: newName)
-            }
-        })
-        
-        let deleteAction = UIAlertAction(title: "Delete Project", style: .destructive, handler: { [weak self] _ in
-            self?.presentOkAlert(title: "Delete Project?", message: nil, okHandler: {
-                self?.viewModel.deleteProject(project: project)
-            })
-        })
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
-        
-        presentAlert(style: .actionSheet, actions: [addAction, updateAction, deleteAction, cancelAction])
-    }
-    
 }
 

@@ -43,6 +43,7 @@ final class ProjectsView: UIView {
             )
             i.register(view: ProjectHeaderView.self)
             i.register(cell: TaskTableViewCell.self)
+            i.contentInset = UIEdgeInsets(top: 16, left: 0, bottom: 0, right: 0)
             return i
         }()
         addSubview(tableView)

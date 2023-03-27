@@ -8,7 +8,7 @@
 import UIKit
 
 protocol ProjectHeaderViewDelegate: AnyObject {
-    func didTapAddTask(_ view: ProjectHeaderView)
+    func didTapMenuButton(_ view: ProjectHeaderView)
 }
 
 final class ProjectHeaderView: UITableViewHeaderFooterView {
@@ -52,7 +52,7 @@ final class ProjectHeaderView: UITableViewHeaderFooterView {
             let i = UIButton()
             i.setImage(UIImage(systemName: "ellipsis"), for: .normal)
             i.clipsToBounds = true
-            i.addTarget(self, action: #selector(didTapAddTask), for: .touchUpInside)
+            i.addTarget(self, action: #selector(didTapMenuButton), for: .touchUpInside)
             return i
         }()
         contentView.addSubview(menuButton)
@@ -75,8 +75,9 @@ final class ProjectHeaderView: UITableViewHeaderFooterView {
     
     // MARK: - Actions
     
-    @objc private func didTapAddTask() {
-        delegate?.didTapAddTask(self)
+    @objc
+    private func didTapMenuButton() {
+        delegate?.didTapMenuButton(self)
     }
     
     // MARK: - Configure
