@@ -59,17 +59,19 @@ final class ProjectHeaderView: UITableViewHeaderFooterView {
     }
     
     private func setupConstraints() {
+        let buttonSize: CGFloat = contentView.height
+        
         titleLabel.frame = CGRect(
             x: Constants.mainInsets,
             y: 0,
-            width: contentView.width - contentView.height - 24 - 16,
+            width: contentView.width - 16 - buttonSize - 16,
             height: contentView.height
         )
         menuButton.frame = CGRect(
-            x: contentView.width - contentView.height - 24,
+            x: titleLabel.right + 8,
             y: 0,
-            width: contentView.height,
-            height: contentView.height
+            width: buttonSize,
+            height: buttonSize
         )
     }
     

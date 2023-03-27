@@ -141,7 +141,7 @@ extension CategoriesViewController: UICollectionViewDataSource {
         
         let category = viewModel.categories.value[indexPath.row]
         cell.delegate = self
-        cell.configure(with: category.name ?? "No Name")
+        cell.configure(with: category.name)
         let colors = [UIColor.darkGray, UIColor.gray, UIColor.lightGray]
         cell.contentView.backgroundColor = colors[indexPath.row % colors.count]
         

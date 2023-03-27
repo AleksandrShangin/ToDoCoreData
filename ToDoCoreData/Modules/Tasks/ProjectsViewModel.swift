@@ -50,14 +50,13 @@ final class ProjectsViewModelImpl: ProjectsViewModel {
     func fetchProjectsAndTasks() {
         var projectTasks: [Organizer] = []
         
-        guard let categoryName = category.name else { return }
-        let predicate = NSPredicate(format: "category.name = %@", categoryName)
+        let predicate = NSPredicate(format: "category.name = %@", category.name)
         persistenceService.fetch(entity: Project.self, predicate: predicate) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success(let projects):
                 for project in projects {
-                    let predicate = NSPredicate(format: "project.name = %@", project.name!)
+                    let predicate = NSPredicate(format: "project.name = %@", project.name)
                     persistenceService.fetch(entity: Task.self, predicate: predicate) { result in
                         switch result {
                         case .success(let tasks):

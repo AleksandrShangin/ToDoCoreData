@@ -89,20 +89,6 @@ final class PersistenceServiceImpl: PersistenceService {
         .eraseToAnyPublisher()
     }
     
-    func delete<T: NSManagedObject>(entities: [T]) -> AnyPublisher<Void, Error> {
-        return Future { [weak self] promise in
-            guard let self = self else { return }
-            entities.forEach { self.context.delete($0) }
-            do {
-                try self.save()
-                promise(.success(()))
-            } catch {
-                promise(.failure(error))
-            }
-        }
-        .eraseToAnyPublisher()
-    }
-    
     // MARK: - Generic Closure Methods
     
     func insert(object: NSManagedObject, completion: (Result<Void, Error>) -> Void) {
@@ -154,7 +140,5 @@ final class PersistenceServiceImpl: PersistenceService {
             completion(.failure(error))
         }
     }
-    
-    func delete<T: NSManagedObject>(entity: T, predicate: NSPredicate, completion: (Result<Void, Error>) -> Void) {}
     
 }

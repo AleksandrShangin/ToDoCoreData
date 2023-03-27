@@ -63,20 +63,20 @@ final class CategoryCollectionViewCell: UICollectionViewCell {
     }
     
     private func setupConstraints() {
-        let imageSize: CGFloat = 40
+        let buttonSize: CGFloat = 40
         
         titleLabel.frame = CGRect(
             x: Constants.mainInsets,
             y: Constants.mainInsets,
             width: contentView.width - 56 - 16,
-            height: (contentView.height-16)/2
+            height: (contentView.height - 16) / 2
         )
         
         menuButton.frame = CGRect(
-            x: contentView.width-56,
+            x: titleLabel.right + Constants.mainInsets,
             y: Constants.mainInsets,
-            width: imageSize,
-            height: imageSize
+            width: buttonSize,
+            height: buttonSize
         )
     }
     
