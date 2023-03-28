@@ -68,7 +68,7 @@ final class ProjectHeaderView: UITableViewHeaderFooterView {
             height: contentView.height
         )
         menuButton.frame = CGRect(
-            x: titleLabel.right + 8,
+            x: titleLabel.right + Constants.mainInsets,
             y: 0,
             width: buttonSize,
             height: buttonSize

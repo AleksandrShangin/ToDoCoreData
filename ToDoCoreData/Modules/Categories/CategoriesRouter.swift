@@ -11,7 +11,7 @@ class CategoriesRouter: BaseRouter {
     
     func showTasks(of category: Category) {
         let projectsViewController = ProjectsFactory(category: category).build()
-        projectsViewController.title = category.name ?? "No Category"
+        projectsViewController.title = category.name
         viewController.navigationController?.pushViewController(projectsViewController, animated: true)
     }
     

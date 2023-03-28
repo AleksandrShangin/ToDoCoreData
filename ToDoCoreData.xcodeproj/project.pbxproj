@@ -19,6 +19,7 @@
 		849DB65F292959E400313C5F /* ProjectsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849DB65E292959E400313C5F /* ProjectsView.swift */; };
 		84CD8EE9292A867D0041682B /* CategoryCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84CD8EE8292A867D0041682B /* CategoryCollectionViewCell.swift */; };
 		84D9AC0A29A4AD3A00385673 /* PersistenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D9AC0929A4AD3A00385673 /* PersistenceService.swift */; };
+		84EE919E29D2D84200DC1AA3 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84EE919D29D2D84200DC1AA3 /* Constants.swift */; };
 		84F7284D298BE22E00FAAE24 /* UITableViewCell+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F7284C298BE22E00FAAE24 /* UITableViewCell+Extensions.swift */; };
 		84F7284F298BE27C00FAAE24 /* UICollectionViewCell+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F7284E298BE27C00FAAE24 /* UICollectionViewCell+Extensions.swift */; };
 		84F72851298BE30A00FAAE24 /* UITableView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F72850298BE30A00FAAE24 /* UITableView+Extensions.swift */; };
@@ -57,6 +58,7 @@
 		849DB65E292959E400313C5F /* ProjectsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectsView.swift; sourceTree = "<group>"; };
 		84CD8EE8292A867D0041682B /* CategoryCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryCollectionViewCell.swift; sourceTree = "<group>"; };
 		84D9AC0929A4AD3A00385673 /* PersistenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceService.swift; sourceTree = "<group>"; };
+		84EE919D29D2D84200DC1AA3 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		84F7284C298BE22E00FAAE24 /* UITableViewCell+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITableViewCell+Extensions.swift"; sourceTree = "<group>"; };
 		84F7284E298BE27C00FAAE24 /* UICollectionViewCell+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UICollectionViewCell+Extensions.swift"; sourceTree = "<group>"; };
 		84F72850298BE30A00FAAE24 /* UITableView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITableView+Extensions.swift"; sourceTree = "<group>"; };
@@ -158,6 +160,7 @@
 			isa = PBXGroup;
 			children = (
 				FA56F4A627D757E600B28543 /* SetupFunction.swift */,
+				84EE919D29D2D84200DC1AA3 /* Constants.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -312,6 +315,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				84D9AC0A29A4AD3A00385673 /* PersistenceService.swift in Sources */,
+				84EE919E29D2D84200DC1AA3 /* Constants.swift in Sources */,
 				FA37BCDF253CA1D700BCB101 /* AppDelegate.swift in Sources */,
 				84F7284F298BE27C00FAAE24 /* UICollectionViewCell+Extensions.swift in Sources */,
 				FA31F25127D766240005929D /* TaskTableViewCell.swift in Sources */,

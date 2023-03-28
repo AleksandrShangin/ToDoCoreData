@@ -69,7 +69,7 @@ final class TaskTableViewCell: UITableViewCell {
         titleLabel.frame = CGRect(
             x: statusImageView.right + Constants.mainInsets,
             y: 0,
-            width: contentView.width - statusImageView.width - 24,
+            width: contentView.width - statusImageView.width - (Constants.mainInsets * 3),
             height: contentView.height
         )
     }

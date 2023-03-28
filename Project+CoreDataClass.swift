@@ -2,7 +2,7 @@
 //  Project+CoreDataClass.swift
 //  ToDoCoreData
 //
-//  Created by Admin on 27.03.2023.
+//  Created by Alexander Shangin on 27.03.2023.
 //
 //
 
