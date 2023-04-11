@@ -77,17 +77,12 @@ final class ProjectsViewController: UIViewController {
     private func configureBindings() {
         viewModel.projects
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                self?.tableView.reloadData()
-            }
+            .sink { [weak self] _ in self?.tableView.reloadData() }
             .store(in: &cancellable)
         
         viewModel.onError
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] error in
-                guard let self = self else { return }
-                self.presentErrorAlert(message: error.localizedDescription)
-            }
+            .sink { [weak self] in self?.presentErrorAlert(message: $0.localizedDescription) }
             .store(in: &cancellable)
     }
     

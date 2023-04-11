@@ -48,24 +48,12 @@ final class ProjectsViewModelImpl: ProjectsViewModel {
     // MARK: - Project Methods
     
     func fetchProjectsAndTasks() {
-        var projectTasks: [Organizer] = []
-        
         let predicate = NSPredicate(format: "category.name = %@", category.name)
         persistenceService.fetch(entity: Project.self, predicate: predicate) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success(let projects):
-                for project in projects {
-                    let predicate = NSPredicate(format: "project.name = %@", project.name)
-                    persistenceService.fetch(entity: Task.self, predicate: predicate) { result in
-                        switch result {
-                        case .success(let tasks):
-                            projectTasks.append(Organizer(project: project, tasks: tasks))
-                        case .failure(let error):
-                            self.onError.send(error)
-                        }
-                    }
-                }
+                let projectTasks = projects.map { Organizer(project: $0, tasks: Array($0.tasks)) }
                 self.projects.send(projectTasks)
             case .failure(let error):
                 self.onError.send(error)
