@@ -13,6 +13,8 @@
 		8472F53029D1D41F004FFC04 /* Task+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8472F52A29D1D41F004FFC04 /* Task+CoreDataProperties.swift */; };
 		8472F53129D1D41F004FFC04 /* Category+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8472F52B29D1D41F004FFC04 /* Category+CoreDataClass.swift */; };
 		8472F53229D1D41F004FFC04 /* Category+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8472F52C29D1D41F004FFC04 /* Category+CoreDataProperties.swift */; };
+		848FD98B29ED2D8A00196565 /* ProjectsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848FD98A29ED2D8A00196565 /* ProjectsDataSource.swift */; };
+		848FD98D29ED30A000196565 /* CategoriesDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848FD98C29ED30A000196565 /* CategoriesDataSource.swift */; };
 		849DB6582928183500313C5F /* CategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849DB6572928183500313C5F /* CategoriesView.swift */; };
 		849DB65A29281BAB00313C5F /* CategoriesRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849DB65929281BAB00313C5F /* CategoriesRouter.swift */; };
 		849DB65C29281BB900313C5F /* BaseRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849DB65B29281BB900313C5F /* BaseRouter.swift */; };
@@ -52,6 +54,8 @@
 		8472F52A29D1D41F004FFC04 /* Task+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Task+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
 		8472F52B29D1D41F004FFC04 /* Category+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Category+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
 		8472F52C29D1D41F004FFC04 /* Category+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Category+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
+		848FD98A29ED2D8A00196565 /* ProjectsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectsDataSource.swift; sourceTree = "<group>"; };
+		848FD98C29ED30A000196565 /* CategoriesDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesDataSource.swift; sourceTree = "<group>"; };
 		849DB6572928183500313C5F /* CategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesView.swift; sourceTree = "<group>"; };
 		849DB65929281BAB00313C5F /* CategoriesRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesRouter.swift; sourceTree = "<group>"; };
 		849DB65B29281BB900313C5F /* BaseRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseRouter.swift; sourceTree = "<group>"; };
@@ -180,6 +184,7 @@
 				849DB65D29281D9D00313C5F /* Views */,
 				849DB6572928183500313C5F /* CategoriesView.swift */,
 				FA94A201274A92440031DC28 /* CategoriesViewController.swift */,
+				848FD98C29ED30A000196565 /* CategoriesDataSource.swift */,
 				FA9567C5274E634C00DF9164 /* CategoriesViewModel.swift */,
 				849DB65929281BAB00313C5F /* CategoriesRouter.swift */,
 				84FD8B6D29D189260083A1E4 /* CategoriesFactory.swift */,
@@ -193,6 +198,7 @@
 				FA932D922857698200D83A6B /* Views */,
 				849DB65E292959E400313C5F /* ProjectsView.swift */,
 				FAC944A2262EAE1F00BCADAD /* ProjectsViewController.swift */,
+				848FD98A29ED2D8A00196565 /* ProjectsDataSource.swift */,
 				FA31F25227D7737C0005929D /* ProjectsViewModel.swift */,
 				84FD8B6F29D18A6E0083A1E4 /* ProjectsFactory.swift */,
 			);
@@ -324,6 +330,7 @@
 				FAC944A3262EAE1F00BCADAD /* ProjectsViewController.swift in Sources */,
 				FA9567C1274E5B0700DF9164 /* UIView+Extensions.swift in Sources */,
 				84FD8B6E29D189260083A1E4 /* CategoriesFactory.swift in Sources */,
+				848FD98D29ED30A000196565 /* CategoriesDataSource.swift in Sources */,
 				84F72851298BE30A00FAAE24 /* UITableView+Extensions.swift in Sources */,
 				84FD8B7029D18A6E0083A1E4 /* ProjectsFactory.swift in Sources */,
 				849DB65F292959E400313C5F /* ProjectsView.swift in Sources */,
@@ -336,6 +343,7 @@
 				849DB65C29281BB900313C5F /* BaseRouter.swift in Sources */,
 				8472F52D29D1D41F004FFC04 /* Project+CoreDataClass.swift in Sources */,
 				849DB6582928183500313C5F /* CategoriesView.swift in Sources */,
+				848FD98B29ED2D8A00196565 /* ProjectsDataSource.swift in Sources */,
 				FA9567C3274E5E7B00DF9164 /* Organizer.swift in Sources */,
 				FA31F25327D7737C0005929D /* ProjectsViewModel.swift in Sources */,
 				FA94A206274A98450031DC28 /* UIViewController+Alert.swift in Sources */,

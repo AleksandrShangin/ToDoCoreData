@@ -14,6 +14,7 @@ final class CategoriesViewController: UIViewController {
     
     weak var collectionView: UICollectionView!
     
+    private var dataSource: CategoriesDataSource!
     private var router: CategoriesRouter!
     private let viewModel: CategoriesViewModel
     private var subscriptions = Set<AnyCancellable>()
@@ -52,11 +53,6 @@ final class CategoriesViewController: UIViewController {
         router = CategoriesRouter(viewController: self)
     }
     
-    private func configureViews() {
-        collectionView.dataSource = self
-        collectionView.delegate = self
-    }
-    
     private func configureNavigationBar() {
         navigationItem.title = "Organizer"
         
@@ -65,6 +61,13 @@ final class CategoriesViewController: UIViewController {
             target: self,
             action: #selector(didTapAdd)
         )
+    }
+    
+    private func configureViews() {
+        dataSource = CategoriesDataSource(collectionView: self.collectionView)
+        collectionView.dataSource = dataSource
+        dataSource.menuButtonTapped = self.didTapMenu(_:)
+        collectionView.delegate = self
     }
     
     // MARK: - Load Data
@@ -78,18 +81,12 @@ final class CategoriesViewController: UIViewController {
     private func configureBindings() {
         viewModel.categories
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
-                guard let self = self else { return }
-                self.collectionView.reloadData()
-            }
+            .sink { [weak self] in self?.dataSource.items = $0 }
             .store(in: &subscriptions)
         
         viewModel.onError
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] error in
-                guard let self = self else { return }
-                self.presentErrorAlert(message: error.localizedDescription)
-            }
+            .sink { [weak self] in self?.presentErrorAlert(message: $0.localizedDescription) }
             .store(in: &subscriptions)
     }
     
@@ -127,66 +124,39 @@ final class CategoriesViewController: UIViewController {
 
 }
 
-
-//MARK: - Extension for UICollectionViewDataSource
-
-extension CategoriesViewController: UICollectionViewDataSource {
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel.categories.value.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueCell(CategoryCollectionViewCell.self, for: indexPath)
-        
-        let category = viewModel.categories.value[indexPath.row]
-        cell.delegate = self
-        cell.configure(with: category.name)
-        let colors = [UIColor.darkGray, UIColor.gray, UIColor.lightGray]
-        cell.contentView.backgroundColor = colors[indexPath.row % colors.count]
-        
-        return cell
-    }
-    
-}
-
 //MARK: - Extension for UICollectionViewDelegate
 
 extension CategoriesViewController: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        insetForSectionAt section: Int
+    ) -> UIEdgeInsets {
+        return UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0)
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        minimumLineSpacingForSectionAt section: Int
+    ) -> CGFloat {
+        return 12
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath
+    ) -> CGSize {
+        let size = CGSize(width: view.width - 24, height: 120)
+        return size
+    }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: true)
         let selectedCategory = viewModel.categories.value[indexPath.row]
         self.didSelectCategory(selectedCategory)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let size = CGSize(width: view.width - 24, height: 120)
-        return size
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 12
-    }
-    
-}
-
-//MARK: - Extension for CategoryCollectionViewCellDelegate
-
-extension CategoriesViewController: CategoryCollectionViewCellDelegate {
-    
-    func didTapMenuButton(_ cell: CategoryCollectionViewCell) {
-        guard let index = collectionView.indexPath(for: cell) else {
-            assertionFailure("Index must be set")
-            return
-        }
-        let selectedCategory = viewModel.categories.value[index.item]
-        
-        self.didTapMenu(selectedCategory)
     }
     
 }

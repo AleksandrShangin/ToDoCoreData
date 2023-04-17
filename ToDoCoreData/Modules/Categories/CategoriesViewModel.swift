@@ -57,10 +57,8 @@ final class CategoriesViewModelImpl: CategoriesViewModel {
         self.persistenceService.fetch(entity: Category.self)
             .sink { [weak self] completion in
                 guard let self = self else { return }
-                switch completion {
-                case .finished:
-                    print("Done fetching categories")
-                case .failure(let error):
+                
+                if case .failure(let error) = completion {
                     self.onError.send(error)
                 }
             } receiveValue: { [weak self] categories in

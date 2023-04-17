@@ -12,8 +12,9 @@ final class ProjectsViewController: UIViewController {
     
     // MARK: - Properties
     
-    private var tableView: UITableView!
+    private weak var tableView: UITableView!
     
+    private var dataSource: ProjectsDataSource!
     private let viewModel: ProjectsViewModel
     private var cancellable = Set<AnyCancellable>()
     
@@ -55,7 +56,8 @@ final class ProjectsViewController: UIViewController {
     }
     
     private func configureViews() {
-        tableView.dataSource = self
+        dataSource = ProjectsDataSource(tableView: self.tableView)
+        tableView.dataSource = dataSource
         tableView.delegate = self
     }
     
@@ -77,7 +79,7 @@ final class ProjectsViewController: UIViewController {
     private func configureBindings() {
         viewModel.projects
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in self?.tableView.reloadData() }
+            .sink { [weak self] in self?.dataSource.items = $0 }
             .store(in: &cancellable)
         
         viewModel.onError
@@ -158,11 +160,32 @@ final class ProjectsViewController: UIViewController {
 
 // MARK: - Extension For UITableViewDataSource
 
-extension ProjectsViewController: UITableViewDataSource {
-    
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return viewModel.projects.value.count
-    }
+//extension ProjectsViewController: UITableViewDataSource {
+//
+//    func numberOfSections(in tableView: UITableView) -> Int {
+//        return viewModel.projects.value.count
+//    }
+//
+//    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+//        let project = viewModel.projects.value[section].project
+//        return project.tasks.count
+//    }
+//
+//    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+//        let cell = tableView.dequeueCell(TaskTableViewCell.self, for: indexPath)
+//
+//        let task = viewModel.projects.value[indexPath.section].tasks[indexPath.row]
+//        let model = TaskViewModel(title: task.name, isCompleted: task.isCompleted)
+//        cell.configure(with: model)
+//        return cell
+//    }
+//
+//}
+
+
+// MARK: - Extension For UITableViewDelegate
+
+extension ProjectsViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let header = tableView.dequeueView(ProjectHeaderView.self)
@@ -173,36 +196,15 @@ extension ProjectsViewController: UITableViewDataSource {
         header.delegate = self
         return header
     }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let project = viewModel.projects.value[section].project
-        return project.tasks.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueCell(TaskTableViewCell.self, for: indexPath)
         
-        let task = viewModel.projects.value[indexPath.section].tasks[indexPath.row]
-        let model = TaskViewModel(title: task.name, isCompleted: task.isCompleted)
-        cell.configure(with: model)
-        return cell
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 44
     }
-    
-}
-
-
-// MARK: - Extension For UITableViewDelegate
-
-extension ProjectsViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let selectedTask = viewModel.projects.value[indexPath.section].tasks[indexPath.row]
         self.didSelectTask(selectedTask)
-    }
-    
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 44
     }
     
 }
