@@ -20,5 +20,4 @@ final class ProjectsFactory: Factory {
         let viewController = ProjectsViewController(viewModel: viewModel)
         return viewController
     }
-    
 }

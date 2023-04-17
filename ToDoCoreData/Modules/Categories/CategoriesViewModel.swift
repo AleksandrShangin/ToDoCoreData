@@ -42,55 +42,53 @@ final class CategoriesViewModelImpl: CategoriesViewModel {
         let newCategory = Category(context: persistenceService.context)
         newCategory.name = name
         
-        persistenceService.insert(object: newCategory) { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success:
-                self.fetchCategories()
-            case .failure(let error):
-                self.onError.send(error)
-            }
-        }
+        persistenceService.insert(object: newCategory)
+            .sink(receiveCompletion: { [weak self] completion in
+                if case .failure(let error) = completion {
+                    self?.onError.send(error)
+                }
+            }, receiveValue: { [weak self] in
+                self?.fetchCategories()
+            })
+            .store(in: &subscriptions)
     }
     
     func fetchCategories() {
         self.persistenceService.fetch(entity: Category.self)
             .sink { [weak self] completion in
-                guard let self = self else { return }
-                
                 if case .failure(let error) = completion {
-                    self.onError.send(error)
+                    self?.onError.send(error)
                 }
             } receiveValue: { [weak self] categories in
-                guard let self = self else { return }
-                self.categories.send(categories)
+                self?.categories.send(categories)
             }
-            .store(in: &self.subscriptions)
-    }
-    
-    func delete(_ category: Category) {
-        persistenceService.delete(entity: category) { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success:
-                self.fetchCategories()
-            case .failure(let error):
-                self.onError.send(error)
-            }
-        }
+            .store(in: &subscriptions)
     }
     
     func rename(_ category: Category, with newName: String) {
         category.name = newName
-        persistenceService.update(entity: category) { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success:
-                self.fetchCategories()
-            case .failure(let error):
-                self.onError.send(error)
+        
+        persistenceService.update(entity: category)
+            .sink(receiveCompletion: { [weak self] completion in
+                if case .failure(let error) = completion {
+                    self?.onError.send(error)
+                }
+            }, receiveValue: { [weak self] in
+                self?.fetchCategories()
+            })
+            .store(in: &subscriptions)
+    }
+    
+    func delete(_ category: Category) {
+        persistenceService.delete(entity: category)
+            .sink { [weak self] completion in
+                if case .failure(let error) = completion {
+                    self?.onError.send(error)
+                }
+            } receiveValue: { [weak self] in
+                self?.fetchCategories()
             }
-        }
+            .store(in: &subscriptions)
     }
     
 }

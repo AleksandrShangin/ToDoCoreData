@@ -49,16 +49,17 @@ final class ProjectsViewModelImpl: ProjectsViewModel {
     
     func fetchProjectsAndTasks() {
         let predicate = NSPredicate(format: "category.name = %@", category.name)
-        persistenceService.fetch(entity: Project.self, predicate: predicate) { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success(let projects):
+        
+        persistenceService.fetch(entity: Project.self, predicate: predicate)
+            .sink(receiveCompletion: { [weak self] completion in
+                if case .failure(let error) = completion {
+                    self?.onError.send(error)
+                }
+            }, receiveValue: { [weak self] projects in
                 let projectTasks = projects.map { Organizer(project: $0, tasks: Array($0.tasks)) }
-                self.projects.send(projectTasks)
-            case .failure(let error):
-                self.onError.send(error)
-            }
-        }
+                self?.projects.send(projectTasks)
+            })
+            .store(in: &subscriptions)
     }
     
     func createNewProject(name: String) {
@@ -66,40 +67,42 @@ final class ProjectsViewModelImpl: ProjectsViewModel {
         newProject.category = self.category
         newProject.name = name
         
-        persistenceService.insert(object: newProject) { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success:
-                self.fetchProjectsAndTasks()
-            case .failure(let error):
-                self.onError.send(error)
-            }
-        }
+        persistenceService.insert(object: newProject)
+            .sink(receiveCompletion: { [weak self] completion in
+                if case .failure(let error) = completion {
+                    self?.onError.send(error)
+                }
+            }, receiveValue: { [weak self] in
+                self?.fetchProjectsAndTasks()
+            })
+            .store(in: &subscriptions)
     }
     
     func updateProject(project: Project, newName: String) {
         project.name = newName
-        persistenceService.update(entity: project) { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success:
-                self.fetchProjectsAndTasks()
-            case .failure(let error):
-                self.onError.send(error)
-            }
-        }
+        
+        persistenceService.update(entity: project)
+            .sink(receiveCompletion: { [weak self] completion in
+                if case .failure(let error) = completion {
+                    self?.onError.send(error)
+                }
+            }, receiveValue: {
+                [weak self] in
+                    self?.fetchProjectsAndTasks()
+            })
+            .store(in: &subscriptions)
     }
     
     func deleteProject(project: Project) {
-        persistenceService.delete(entity: project) { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success:
-                self.fetchProjectsAndTasks()
-            case .failure(let error):
-                self.onError.send(error)
-            }
-        }
+        persistenceService.delete(entity: project)
+            .sink(receiveCompletion: { [weak self] completion in
+                if case .failure(let error) = completion {
+                    self?.onError.send(error)
+                }
+            }, receiveValue: { [weak self] in
+                self?.fetchProjectsAndTasks()
+            })
+            .store(in: &subscriptions)
     }
     
     // MARK: - Task Methods
@@ -111,66 +114,69 @@ final class ProjectsViewModelImpl: ProjectsViewModel {
         newTask.name = name
         newTask.isCompleted = false
         
-        persistenceService.insert(object: newTask) { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success:
-                self.fetchProjectsAndTasks()
-            case .failure(let error):
-                self.onError.send(error)
-            }
-        }
+        persistenceService.insert(object: newTask)
+            .sink(receiveCompletion: { [weak self] completion in
+                if case .failure(let error) = completion {
+                    self?.onError.send(error)
+                }
+            }, receiveValue: { [weak self] in
+                self?.fetchProjectsAndTasks()
+            })
+            .store(in: &subscriptions)
     }
     
     func completeTask(_ task: Task) {
         task.isCompleted = true
-        persistenceService.update(entity: task) { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success:
-                self.fetchProjectsAndTasks()
-            case .failure(let error):
-                self.onError.send(error)
-            }
-        }
+        
+        persistenceService.update(entity: task)
+            .sink(receiveCompletion: { [weak self] completion in
+                if case .failure(let error) = completion {
+                    self?.onError.send(error)
+                }
+            }, receiveValue: { [weak self] in
+                self?.fetchProjectsAndTasks()
+            })
+            .store(in: &subscriptions)
     }
     
     func undoCompleteTask(_ task: Task) {
         task.isCompleted = false
-        persistenceService.update(entity: task) { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success:
-                self.fetchProjectsAndTasks()
-            case .failure(let error):
-                self.onError.send(error)
-            }
-        }
+        
+        persistenceService.update(entity: task)
+            .sink(receiveCompletion: { [weak self] completion in
+                if case .failure(let error) = completion {
+                    self?.onError.send(error)
+                }
+            }, receiveValue: { [weak self] in
+                self?.fetchProjectsAndTasks()
+            })
+            .store(in: &subscriptions)
     }
     
     func renameTask(_ task: Task, with newName: String) {
         task.name = newName
-        persistenceService.update(entity: task) { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success:
-                self.fetchProjectsAndTasks()
-            case .failure(let error):
-                self.onError.send(error)
-            }
-        }
+        
+        persistenceService.update(entity: task)
+            .sink(receiveCompletion: { [weak self] completion in
+                if case .failure(let error) = completion {
+                    self?.onError.send(error)
+                }
+            }, receiveValue: { [weak self] in
+                self?.fetchProjectsAndTasks()
+            })
+            .store(in: &subscriptions)
     }
     
     func deleteTask(_ task: Task) {
-        persistenceService.delete(entity: task) { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success:
-                self.fetchProjectsAndTasks()
-            case .failure(let error):
-                self.onError.send(error)
-            }
-        }
+        persistenceService.delete(entity: task)
+            .sink(receiveCompletion: { [weak self] completion in
+                if case .failure(let error) = completion {
+                    self?.onError.send(error)
+                }
+            }, receiveValue: { [weak self] in
+                self?.fetchProjectsAndTasks()
+            })
+            .store(in: &subscriptions)
     }
     
 }

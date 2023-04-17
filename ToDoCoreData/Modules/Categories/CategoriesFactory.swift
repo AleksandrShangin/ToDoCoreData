@@ -10,9 +10,7 @@ import Foundation
 final class CategoriesFactory: Factory {
     func build() -> CategoriesViewController {
         let persistenceService: PersistenceService = PersistenceServiceImpl.shared
-        
         let viewModel: CategoriesViewModel = CategoriesViewModelImpl(persistenceService: persistenceService)
-        
         let viewController = CategoriesViewController(viewModel: viewModel)
         return viewController
     }

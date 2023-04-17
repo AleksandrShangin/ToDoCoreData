@@ -46,6 +46,20 @@ final class PersistenceServiceImpl: PersistenceService {
     
     // MARK: - Generic Combine Methods
     
+    func insert(object: NSManagedObject) -> AnyPublisher<Void, Error> {
+        return Future { [weak self] promise in
+            guard let self = self else { return }
+            self.context.insert(object)
+            do {
+                try self.save()
+                promise(.success(()))
+            } catch {
+                promise(.failure(error))
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+    
     func fetch<T: NSManagedObject>(entity: T.Type) -> AnyPublisher<[T], Error> {
         return Future { [weak self] promise in
             guard let self = self else { return }
@@ -75,6 +89,19 @@ final class PersistenceServiceImpl: PersistenceService {
         .eraseToAnyPublisher()
     }
     
+    func update(entity: NSManagedObject) -> AnyPublisher<Void, Error> {
+        return Future { [weak self] promise in
+            guard let self = self else { return }
+            do {
+                try self.save()
+                promise(.success(()))
+            } catch {
+                promise(.failure(error))
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+    
     func delete<T: NSManagedObject>(entity: T) -> AnyPublisher<Void, Error> {
         return Future { [weak self] promise in
             guard let self = self else { return }
@@ -87,58 +114,6 @@ final class PersistenceServiceImpl: PersistenceService {
             }
         }
         .eraseToAnyPublisher()
-    }
-    
-    // MARK: - Generic Closure Methods
-    
-    func insert(object: NSManagedObject, completion: (Result<Void, Error>) -> Void) {
-        context.insert(object)
-        do {
-            try self.save()
-            completion(.success(()))
-        } catch {
-            completion(.failure(error))
-        }
-    }
-    
-    func fetch<T: NSManagedObject>(entity: T.Type, completion: (Result<[T], Error>) -> Void) {
-        let request = NSFetchRequest<T>(entityName: String(describing: T.self))
-        do {
-            let results = try context.fetch(request)
-            completion(.success(results))
-        } catch {
-            completion(.failure(error))
-        }
-    }
-    
-    func fetch<T: NSManagedObject>(entity: T.Type, predicate: NSPredicate, completion: (Result<[T], Error>) -> Void) {
-        let request = NSFetchRequest<T>(entityName: String(describing: T.self))
-        request.predicate = predicate
-        do {
-            let results = try context.fetch(request)
-            completion(.success(results))
-        } catch {
-            completion(.failure(error))
-        }
-    }
-    
-    func update(entity: NSManagedObject, completion: (Result<Void, Error>) -> Void) {
-        do {
-            try self.save()
-            completion(.success(()))
-        } catch {
-            completion(.failure(error))
-        }
-    }
-    
-    func delete(entity: NSManagedObject, completion: (Result<Void, Error>) -> Void) {
-        context.delete(entity)
-        do {
-            try self.save()
-            completion(.success(()))
-        } catch {
-            completion(.failure(error))
-        }
     }
     
 }
