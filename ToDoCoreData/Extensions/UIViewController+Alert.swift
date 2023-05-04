@@ -63,6 +63,8 @@ extension UIViewController {
         
         alert.addTextField { textField in
             textField.autocapitalizationType = .words
+            textField.spellCheckingType = .yes
+            
             guard let updateName = updateName else {
                 return
             }
