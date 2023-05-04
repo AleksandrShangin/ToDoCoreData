@@ -2,7 +2,7 @@
 //  Task+CoreDataProperties.swift
 //  ToDoCoreData
 //
-//  Created by Alexander Shangin on 27.03.2023.
+//  Created by Alexander Shangin on 04.05.2023.
 //
 //
 
@@ -19,8 +19,8 @@ extension Task {
     @NSManaged public var index: Int64
     @NSManaged public var isCompleted: Bool
     @NSManaged public var name: String
-    @NSManaged public var category: Category
-    @NSManaged public var project: Project
+    @NSManaged public var category: Category?
+    @NSManaged public var project: Project?
 
 }
 

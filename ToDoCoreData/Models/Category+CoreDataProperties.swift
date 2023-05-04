@@ -2,7 +2,7 @@
 //  Category+CoreDataProperties.swift
 //  ToDoCoreData
 //
-//  Created by Alexander Shangin on 27.03.2023.
+//  Created by Alexander Shangin on 04.05.2023.
 //
 //
 
@@ -17,8 +17,8 @@ extension Category {
     }
 
     @NSManaged public var name: String
-    @NSManaged public var projects: NSSet
-    @NSManaged public var tasks: NSSet
+    @NSManaged public var projects: Set<Project>
+    @NSManaged public var tasks: NSSet?
 
 }
 
