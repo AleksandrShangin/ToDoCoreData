@@ -54,8 +54,9 @@ final class TaskTableViewCell: UITableViewCell {
     
     private func setupConstraints() {
         statusImageView.snp.makeConstraints {
-            $0.left.top.bottom.equalToSuperview().inset(Constants.mainInsets)
+            $0.left.equalToSuperview().inset(Constants.mainInsets)
             $0.size.equalTo(44 - 16)
+            $0.centerY.equalToSuperview()
         }
         titleLabel.snp.makeConstraints {
             $0.left.equalTo(statusImageView.snp.right).offset(Constants.mainInsets)

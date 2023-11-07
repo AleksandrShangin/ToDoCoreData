@@ -60,7 +60,7 @@ final class ProjectHeaderView: UITableViewHeaderFooterView {
         
         menuButton.snp.makeConstraints {
             $0.top.bottom.equalToSuperview()
-            $0.left.equalTo(titleLabel.snp.right).offset(Constants.mainInsets)
+            $0.left.lessThanOrEqualTo(titleLabel.snp.right).offset(Constants.mainInsets)
             $0.right.equalToSuperview().inset(Constants.mainInsets * 2)
             $0.width.equalTo(44)
         }
