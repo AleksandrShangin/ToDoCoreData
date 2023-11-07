@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SnapKit
 
 struct TaskViewModel {
     let title: String
@@ -16,25 +17,27 @@ final class TaskTableViewCell: UITableViewCell {
     
     // MARK: - Properties
     
-    private var statusImageView: UIImageView!
-    private var titleLabel: UILabel!
+    private let statusImageView = {
+        let i = UIImageView()
+        i.contentMode = .scaleAspectFit
+        return i
+    }()
+    
+    private let titleLabel = {
+        let i = UILabel()
+        return i
+    }()
     
     // MARK: - Init
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupSubviews()
+        setupConstraints()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    // MARK: - Lifecycle
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        setupConstraints()
     }
     
     override func prepareForReuse() {
@@ -44,34 +47,22 @@ final class TaskTableViewCell: UITableViewCell {
     
     // MARK: - Setup
     
-    private func setupSubviews() {
-        statusImageView = {
-            let i = UIImageView()
-            i.contentMode = .scaleAspectFit
-            return i
-        }()
+    private func setupSubviews() {        
         contentView.addSubview(statusImageView)
-        
-        titleLabel = {
-            let i = UILabel()
-            return i
-        }()
         contentView.addSubview(titleLabel)
     }
     
     private func setupConstraints() {
-        statusImageView.frame = CGRect(
-            x: Constants.mainInsets,
-            y: Constants.mainInsets,
-            width: contentView.height - (Constants.mainInsets * 2),
-            height: contentView.height - (Constants.mainInsets * 2)
-        )
-        titleLabel.frame = CGRect(
-            x: statusImageView.right + Constants.mainInsets,
-            y: 0,
-            width: contentView.width - statusImageView.width - (Constants.mainInsets * 3),
-            height: contentView.height
-        )
+        statusImageView.snp.makeConstraints {
+            $0.left.top.bottom.equalToSuperview().inset(Constants.mainInsets)
+            $0.size.equalTo(44 - 16)
+        }
+        titleLabel.snp.makeConstraints {
+            $0.left.equalTo(statusImageView.snp.right).offset(Constants.mainInsets)
+            $0.right.equalToSuperview().inset(Constants.mainInsets)
+            $0.height.equalTo(44 - 16)
+            $0.centerY.equalToSuperview()
+        }
     }
     
     // MARK: - Configure

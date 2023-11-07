@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SnapKit
 
 protocol CategoryCollectionViewCellDelegate: AnyObject {
     func didTapMenuButton(_ cell: CategoryCollectionViewCell)
@@ -15,8 +16,18 @@ final class CategoryCollectionViewCell: UICollectionViewCell {
     
     // MARK: - Properties
     
-    var titleLabel: UILabel!
-    var menuButton: UIButton!
+    let titleLabel = {
+        let i = UILabel()
+        i.font = .preferredFont(forTextStyle: .title1)
+        return i
+    }()
+    
+    let menuButton = {
+        let i = UIButton()
+        i.setImage(UIImage(systemName: "ellipsis"), for: .normal)
+        i.clipsToBounds = true
+        return i
+    }()
     
     weak var delegate: CategoryCollectionViewCellDelegate?
     
@@ -25,17 +36,11 @@ final class CategoryCollectionViewCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupSubviews()
+        setupConstraints()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    // MARK: - Lifecycle
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        setupConstraints()
     }
     
     // MARK: - Setup
@@ -45,39 +50,25 @@ final class CategoryCollectionViewCell: UICollectionViewCell {
         contentView.layer.cornerRadius = 10
         contentView.clipsToBounds = true
         
-        titleLabel = {
-            let i = UILabel()
-            i.font = .preferredFont(forTextStyle: .title1)
-            return i
-        }()
         contentView.addSubview(titleLabel)
         
-        menuButton = {
-            let i = UIButton()
-            i.setImage(UIImage(systemName: "ellipsis"), for: .normal)
-            i.clipsToBounds = true
-            i.addTarget(self, action: #selector(didTapMenu), for: .touchUpInside)
-            return i
-        }()
+        menuButton.addTarget(self, action: #selector(didTapMenu), for: .touchUpInside)
         contentView.addSubview(menuButton)
     }
     
     private func setupConstraints() {
-        let buttonSize: CGFloat = 40
+        titleLabel.snp.makeConstraints {
+            $0.top.equalTo(Constants.mainInsets)
+            $0.left.equalTo(Constants.mainInsets)
+            $0.right.equalTo(menuButton.snp.left).offset(-Constants.mainInsets)
+            $0.height.equalTo((120 - 16) / 2)
+        }
         
-        titleLabel.frame = CGRect(
-            x: Constants.mainInsets,
-            y: Constants.mainInsets,
-            width: contentView.width - 56 - 16,
-            height: (contentView.height - 16) / 2
-        )
-        
-        menuButton.frame = CGRect(
-            x: titleLabel.right + Constants.mainInsets,
-            y: Constants.mainInsets,
-            width: buttonSize,
-            height: buttonSize
-        )
+        menuButton.snp.makeConstraints {
+            $0.top.equalTo(Constants.mainInsets)
+            $0.right.equalTo(-Constants.mainInsets * 2)
+            $0.size.equalTo(40)
+        }
     }
     
     

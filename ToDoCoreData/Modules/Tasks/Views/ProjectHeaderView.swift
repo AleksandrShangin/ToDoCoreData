@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SnapKit
 
 protocol ProjectHeaderViewDelegate: AnyObject {
     func didTapMenuButton(_ view: ProjectHeaderView)
@@ -15,8 +16,18 @@ final class ProjectHeaderView: UITableViewHeaderFooterView {
     
     // MARK: - Properties
     
-    private var titleLabel: UILabel!
-    private var menuButton: UIButton!
+    private let titleLabel = {
+        let i = UILabel()
+        i.font = .preferredFont(forTextStyle: .title2)
+        return i
+    }()
+    
+    private let menuButton = {
+        let i = UIButton()
+        i.setImage(UIImage(systemName: "ellipsis"), for: .normal)
+        i.clipsToBounds = true
+        return i
+    }()
     
     weak var delegate: ProjectHeaderViewDelegate?
     
@@ -25,54 +36,34 @@ final class ProjectHeaderView: UITableViewHeaderFooterView {
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
         setupSubviews()
+        setupConstraints()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Lifecycle
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        setupConstraints()
-    }
-    
     // MARK: - Setup
     
     private func setupSubviews() {
-        titleLabel = {
-            let i = UILabel()
-            i.font = .preferredFont(forTextStyle: .title2)
-            return i
-        }()
         contentView.addSubview(titleLabel)
         
-        menuButton = {
-            let i = UIButton()
-            i.setImage(UIImage(systemName: "ellipsis"), for: .normal)
-            i.clipsToBounds = true
-            i.addTarget(self, action: #selector(didTapMenuButton), for: .touchUpInside)
-            return i
-        }()
+        menuButton.addTarget(self, action: #selector(didTapMenuButton), for: .touchUpInside)
         contentView.addSubview(menuButton)
     }
     
     private func setupConstraints() {
-        let buttonSize: CGFloat = contentView.height
+        titleLabel.snp.makeConstraints {
+            $0.left.equalTo(Constants.mainInsets)
+            $0.height.equalToSuperview()
+        }
         
-        titleLabel.frame = CGRect(
-            x: Constants.mainInsets,
-            y: 0,
-            width: contentView.width - 16 - buttonSize - 16,
-            height: contentView.height
-        )
-        menuButton.frame = CGRect(
-            x: titleLabel.right + Constants.mainInsets,
-            y: 0,
-            width: buttonSize,
-            height: buttonSize
-        )
+        menuButton.snp.makeConstraints {
+            $0.top.bottom.equalToSuperview()
+            $0.left.equalTo(titleLabel.snp.right).offset(Constants.mainInsets)
+            $0.right.equalToSuperview().inset(Constants.mainInsets * 2)
+            $0.width.equalTo(44)
+        }
     }
     
     // MARK: - Actions

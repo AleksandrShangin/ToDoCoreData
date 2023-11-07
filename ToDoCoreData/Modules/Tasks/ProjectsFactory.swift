@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class ProjectsFactory: Factory {
+final class ProjectsFactory: ModuleFactory {
     private let category: Category
     
     init(category: Category) {

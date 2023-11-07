@@ -6,57 +6,54 @@
 //
 
 import UIKit
+import SnapKit
 
 final class CategoriesView: UIView {
     
     //MARK: - Properties
     
-    var layout: UICollectionViewFlowLayout!
-    var collectionView: UICollectionView!
+    let collectionView = {
+        let layout = {
+            let i = UICollectionViewFlowLayout()
+            i.scrollDirection = .vertical
+            return i
+        }()
+        
+        let i = UICollectionView(
+            frame: .zero,
+            collectionViewLayout: layout
+        )
+        i.register(cell: CategoryCollectionViewCell.self)
+        i.showsVerticalScrollIndicator = false
+        i.automaticallyAdjustsScrollIndicatorInsets = true
+        i.contentInsetAdjustmentBehavior = .automatic
+        return i
+    }()
     
     //MARK: - Init
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupSubviews()
+        setupConstraints()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    //MARK: - Lifecycle
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        setupConstraints()
-    }
  
     //MARK: - Setup
     
     private func setupSubviews() {
-        layout = {
-            let i = UICollectionViewFlowLayout()
-            i.scrollDirection = .vertical
-            return i
-        }()
+        backgroundColor = .systemBackground
         
-        collectionView = {
-            let i = UICollectionView(
-                frame: .zero,
-                collectionViewLayout: layout
-            )
-            i.register(cell: CategoryCollectionViewCell.self)
-            i.showsVerticalScrollIndicator = false
-            i.automaticallyAdjustsScrollIndicatorInsets = true
-            i.contentInsetAdjustmentBehavior = .automatic
-            return i
-        }()
         addSubview(collectionView)
     }
     
     private func setupConstraints() {
-        collectionView.frame = bounds
+        collectionView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
     }
     
 }
