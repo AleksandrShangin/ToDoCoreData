@@ -8,11 +8,10 @@
 import UIKit
 import Combine
 
-final class ProjectsViewController: UIViewController {
+final class ProjectsViewController: UIViewController, CustomViewProtocol {
+    typealias RootView = ProjectsView
     
     // MARK: - Properties
-    
-    private weak var tableView: UITableView!
     
     private var dataSource: ProjectsDataSource!
     private let viewModel: ProjectsViewModel
@@ -34,7 +33,6 @@ final class ProjectsViewController: UIViewController {
     override func loadView() {
         let view = ProjectsView()
         self.view = view
-        self.tableView = view.tableView
     }
     
     override func viewDidLoad() {
@@ -56,16 +54,16 @@ final class ProjectsViewController: UIViewController {
     }
     
     private func configureViews() {
-        dataSource = ProjectsDataSource(tableView: self.tableView)
-        tableView.dataSource = dataSource
-        tableView.delegate = self
+        dataSource = ProjectsDataSource(tableView: self.customView.tableView)
+        customView.tableView.dataSource = dataSource
+        customView.tableView.delegate = self
     }
     
     // MARK: - Overriden Methods
     
     override func setEditing(_ editing: Bool, animated: Bool) {
         super.setEditing(editing, animated: true)
-        tableView.setEditing(editing, animated: true)
+        customView.tableView.setEditing(editing, animated: true)
     }
     
     // MARK: - Load Data
@@ -158,35 +156,10 @@ final class ProjectsViewController: UIViewController {
 
 }
 
-// MARK: - Extension For UITableViewDataSource
-
-//extension ProjectsViewController: UITableViewDataSource {
-//
-//    func numberOfSections(in tableView: UITableView) -> Int {
-//        return viewModel.projects.value.count
-//    }
-//
-//    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-//        let project = viewModel.projects.value[section].project
-//        return project.tasks.count
-//    }
-//
-//    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//        let cell = tableView.dequeueCell(TaskTableViewCell.self, for: indexPath)
-//
-//        let task = viewModel.projects.value[indexPath.section].tasks[indexPath.row]
-//        let model = TaskViewModel(title: task.name, isCompleted: task.isCompleted)
-//        cell.configure(with: model)
-//        return cell
-//    }
-//
-//}
-
 
 // MARK: - Extension For UITableViewDelegate
 
 extension ProjectsViewController: UITableViewDelegate {
-    
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let header = tableView.dequeueView(ProjectHeaderView.self)
         
@@ -206,7 +179,6 @@ extension ProjectsViewController: UITableViewDelegate {
         let selectedTask = viewModel.projects.value[indexPath.section].tasks[indexPath.row]
         self.didSelectTask(selectedTask)
     }
-    
 }
 
 

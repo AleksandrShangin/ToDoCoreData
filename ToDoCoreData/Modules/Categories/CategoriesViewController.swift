@@ -8,11 +8,10 @@
 import UIKit
 import Combine
 
-final class CategoriesViewController: UIViewController {
-
-    // MARK: - Properties
+final class CategoriesViewController: UIViewController, CustomViewProtocol {
+    typealias RootView = CategoriesView
     
-    weak var collectionView: UICollectionView!
+    // MARK: - Properties
     
     private var dataSource: CategoriesDataSource!
     private var router: CategoriesRouter!
@@ -35,7 +34,6 @@ final class CategoriesViewController: UIViewController {
     override func loadView() {
         let view = CategoriesView()
         self.view = view
-        collectionView = view.collectionView
     }
     
     override func viewDidLoad() {
@@ -64,10 +62,10 @@ final class CategoriesViewController: UIViewController {
     }
     
     private func configureViews() {
-        dataSource = CategoriesDataSource(collectionView: self.collectionView)
-        collectionView.dataSource = dataSource
+        dataSource = CategoriesDataSource(collectionView: self.customView.collectionView)
+        customView.collectionView.dataSource = dataSource
         dataSource.menuButtonTapped = self.didTapMenu(_:)
-        collectionView.delegate = self
+        customView.collectionView.delegate = self
     }
     
     // MARK: - Load Data
@@ -127,7 +125,6 @@ final class CategoriesViewController: UIViewController {
 //MARK: - Extension for UICollectionViewDelegate
 
 extension CategoriesViewController: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
-    
     func collectionView(
         _ collectionView: UICollectionView,
         layout collectionViewLayout: UICollectionViewLayout,
@@ -158,5 +155,4 @@ extension CategoriesViewController: UICollectionViewDelegate, UICollectionViewDe
         let selectedCategory = viewModel.categories.value[indexPath.row]
         self.didSelectCategory(selectedCategory)
     }
-    
 }
