@@ -52,7 +52,7 @@ final class CategoriesViewController: UIViewController, CustomViewProtocol {
     }
     
     private func configureNavigationBar() {
-        navigationItem.title = "Organizer"
+        navigationItem.title = L10n.Categories.title
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .add,
@@ -91,7 +91,7 @@ final class CategoriesViewController: UIViewController, CustomViewProtocol {
     // MARK: - Actions
     
     @objc private func didTapAdd() {
-        presentAddAlert(title: "New Category", updateName: nil) { [weak self] name in
+        presentAddAlert(title: L10n.Categories.new) { [weak self] name in
             guard let self = self else { return }
             self.viewModel.createCategory(name: name)
         }
@@ -104,17 +104,17 @@ final class CategoriesViewController: UIViewController, CustomViewProtocol {
     private func didTapMenu(_ selectedCategory: Category) {
         self.presentAlert(
             actions: [
-                UIAlertAction(title: "Rename Category", style: .default) { [weak self] _ in
-                    self?.presentAddAlert(title: "Rename Category", message: nil, updateName: selectedCategory.name) { newName in
+                UIAlertAction(title: L10n.Categories.rename, style: .default) { [weak self] _ in
+                    self?.presentAddAlert(title: L10n.Categories.rename, updateName: selectedCategory.name) { newName in
                         self?.viewModel.rename(selectedCategory, with: newName)
                     }
                 },
-                UIAlertAction(title: "Delete Category", style: .destructive) { [weak self] _ in
-                    self?.presentOkAlert(title: "Delete Category?", message: selectedCategory.name, okHandler: {
+                UIAlertAction(title: L10n.Categories.delete, style: .destructive) { [weak self] _ in
+                    self?.presentOkAlert(title: "\(L10n.Categories.delete)?", message: selectedCategory.name, okHandler: {
                         self?.viewModel.delete(selectedCategory)
                     })
                 },
-                UIAlertAction(title: "Cancel", style: .cancel)
+                UIAlertAction(title: L10n.Common.cancel, style: .cancel)
             ],
             style: .actionSheet
         )

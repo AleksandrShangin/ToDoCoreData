@@ -1,0 +1,35 @@
+/* 
+  Localizable.strings
+  ToDoCoreData
+
+  Created by Alexander Shangin on 12.11.2023.
+  
+*/
+
+// Common
+
+"Common.ok" = "ОК";
+"common.error" = "Ошибка";
+"common.cancel" = "Отмена";
+
+// Category
+
+"categories.title" = "Органайзер";
+"categories.new" = "Новая Категория";
+"categories.rename" = "Переименовать Категорию";
+"categories.delete" = "Удалить Категорию";
+
+// Project
+
+"project.new" = "Новый Проект";
+"project.rename" = "Переименовать Проект";
+"project.delete" = "Удалить Проект";
+
+// Task
+
+"task.new" = "Новая Задача";
+"task.add-new" = "Добавить Новую Задачу";
+"task.rename" = "Переименовать Задачу";
+"task.complete" = "Завершить Задачу";
+"task.undo-complete" = "Отменить Завершение";
+"task.delete" = "Удалить Задачу";

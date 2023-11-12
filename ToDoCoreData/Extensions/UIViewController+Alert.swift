@@ -30,10 +30,10 @@ extension UIViewController {
     /// Base Error Alert
     func presentErrorAlert(message: String) {
         presentAlert(
-            title: "Error",
+            title: L10n.Common.error,
             message: message,
             actions: [
-                UIAlertAction(title: "OK", style: .cancel)
+                UIAlertAction(title: L10n.Common.ok, style: .cancel)
             ]
         )
     }
@@ -48,10 +48,10 @@ extension UIViewController {
             title: title,
             message: message,
             actions: [
-                UIAlertAction(title: "OK", style: .default) { _ in
+                UIAlertAction(title: L10n.Common.ok, style: .default) { _ in
                     okHandler()
                 },
-                UIAlertAction(title: "Cancel", style: .cancel)
+                UIAlertAction(title: L10n.Common.cancel, style: .cancel)
             ]
         )
     }
@@ -60,7 +60,7 @@ extension UIViewController {
     func presentAddAlert(
         title: String,
         message: String? = nil,
-        updateName: String?,
+        updateName: String? = nil,
         okHandler: @escaping ParameterClosure<String>
     ) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
@@ -74,11 +74,11 @@ extension UIViewController {
             }
             textField.text = updateName
         }
-        alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
+        alert.addAction(UIAlertAction(title: L10n.Common.ok, style: .default) { _ in
             guard let text = alert.textFields?.last?.text else { return }
             okHandler(text)
         })
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(UIAlertAction(title: L10n.Common.cancel, style: .cancel))
         
         present(alert, animated: true)
     }

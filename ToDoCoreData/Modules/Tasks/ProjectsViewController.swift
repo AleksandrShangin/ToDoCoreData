@@ -90,7 +90,7 @@ final class ProjectsViewController: UIViewController, CustomViewProtocol {
     
     @objc
     private func didTapAddButton() {
-        presentAddAlert(title: "New Project", updateName: nil) { [weak self] name in
+        presentAddAlert(title: L10n.Project.new) { [weak self] name in
             guard let self = self else { return }
             self.viewModel.createNewProject(name: name)
         }
@@ -99,55 +99,55 @@ final class ProjectsViewController: UIViewController, CustomViewProtocol {
     private func didTapMenu(project: Project) {
         self.presentAlert(
             actions: [
-                UIAlertAction(title: "Add New Task", style: .default) { [weak self] _ in
+                UIAlertAction(title: L10n.Task.addNew, style: .default) { [weak self] _ in
                     guard let self = self else { return }
-                    self.presentAddAlert(title: "New Task", updateName: nil) { taskName in
+                    self.presentAddAlert(title: L10n.Task.new) { taskName in
                         self.viewModel.createNewTask(project: project, name: taskName)
                     }
                 },
-                UIAlertAction(title: "Rename Project", style: .default) { [weak self] _ in
-                    self?.presentAddAlert(title: "Rename Project", message: nil, updateName: project.name) { newName in
+                UIAlertAction(title: L10n.Project.rename, style: .default) { [weak self] _ in
+                    self?.presentAddAlert(title: L10n.Project.rename, updateName: project.name) { newName in
                         self?.viewModel.updateProject(project: project, newName: newName)
                     }
                 },
-                UIAlertAction(title: "Delete Project", style: .destructive) { [weak self] _ in
-                    self?.presentOkAlert(title: "Delete Project?", message: project.name, okHandler: {
+                UIAlertAction(title: L10n.Project.delete, style: .destructive) { [weak self] _ in
+                    self?.presentOkAlert(title: "\(L10n.Project.delete)?", message: project.name, okHandler: {
                         self?.viewModel.deleteProject(project: project)
                     })
                 },
-                UIAlertAction(title: "Cancel", style: .cancel)
+                UIAlertAction(title: L10n.Common.cancel, style: .cancel)
             ],
             style: .actionSheet
         )
     }
     
     private func didSelectTask(_ selectedTask: Task) {
-        let undoCompleteAction = UIAlertAction(title: "Undo Complete", style: .default) { [weak self] _ in
+        let undoCompleteAction = UIAlertAction(title: L10n.Task.undoComplete, style: .default) { [weak self] _ in
             guard let self = self else { return }
-            self.presentOkAlert(title: "Undo Complete?") {
+            self.presentOkAlert(title: "\(L10n.Task.undoComplete)?") {
                 self.viewModel.undoCompleteTask(selectedTask)
             }
         }
         
-        let completeAction = UIAlertAction(title: "Complete Task", style: .default) { [weak self] _ in
+        let completeAction = UIAlertAction(title: L10n.Task.complete, style: .default) { [weak self] _ in
             guard let self = self else { return }
             self.viewModel.completeTask(selectedTask)
         }
-        let updateAction = UIAlertAction(title: "Rename Task", style: .default) { [weak self] _ in
+        let updateAction = UIAlertAction(title: L10n.Task.rename, style: .default) { [weak self] _ in
             guard let self = self else { return }
-            self.presentAddAlert(title: "Rename Task", message: nil, updateName: selectedTask.name) { newName in
+            self.presentAddAlert(title: L10n.Task.rename, updateName: selectedTask.name) { newName in
                 self.viewModel.renameTask(selectedTask, with: newName)
             }
         }
         
-        let deleteAction = UIAlertAction(title: "Delete Task", style: .destructive) { [weak self] _ in
+        let deleteAction = UIAlertAction(title: L10n.Task.delete, style: .destructive) { [weak self] _ in
             guard let self = self else { return }
-            self.presentOkAlert(title: "Delete Task?", message: selectedTask.name) {
+            self.presentOkAlert(title: "\(L10n.Task.delete)?", message: selectedTask.name) {
                 self.viewModel.deleteTask(selectedTask)
             }
         }
         
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        let cancelAction = UIAlertAction(title: L10n.Common.cancel, style: .cancel)
         
         let actions = !selectedTask.isCompleted ? [completeAction, updateAction, deleteAction, cancelAction] : [undoCompleteAction, updateAction, deleteAction, cancelAction]
         
