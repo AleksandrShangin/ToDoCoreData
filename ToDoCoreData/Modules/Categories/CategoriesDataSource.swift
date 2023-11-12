@@ -19,7 +19,7 @@ final class CategoriesDataSource: NSObject, UICollectionViewDataSource, Category
         }
     }
     
-    var menuButtonTapped: ((Category) -> Void)?
+    var menuButtonTapped: ParameterClosure<Category>?
     
     //MARK: - Init
     

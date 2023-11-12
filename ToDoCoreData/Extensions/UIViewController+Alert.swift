@@ -39,7 +39,11 @@ extension UIViewController {
     }
     
     /// Base Ok Alert
-    func presentOkAlert(title: String, message: String? = nil, okHandler: @escaping () -> Void) {
+    func presentOkAlert(
+        title: String,
+        message: String? = nil,
+        okHandler: @escaping VoidClosure
+    ) {
         presentAlert(
             title: title,
             message: message,
@@ -57,7 +61,7 @@ extension UIViewController {
         title: String,
         message: String? = nil,
         updateName: String?,
-        okHandler: @escaping (String) -> Void
+        okHandler: @escaping ParameterClosure<String>
     ) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         

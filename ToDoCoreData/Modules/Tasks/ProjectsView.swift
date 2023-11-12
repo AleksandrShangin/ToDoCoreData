@@ -12,16 +12,11 @@ final class ProjectsView: UIView {
     
     //MARK: - Properties
     
-    let tableView = {
-        let i = UITableView(
-            frame: .zero,
-            style: .grouped
-        )
-        i.register(view: ProjectHeaderView.self)
-        i.register(cell: TaskTableViewCell.self)
-        i.contentInset = UIEdgeInsets(top: 16, left: 0, bottom: 0, right: 0)
-        return i
-    }()
+    let tableView = setup(UITableView(frame: .zero, style: .grouped)) {
+        $0.register(view: ProjectHeaderView.self)
+        $0.register(cell: TaskTableViewCell.self)
+        $0.contentInset = UIEdgeInsets(top: 16, left: 0, bottom: 0, right: 0)
+    }
     
     //MARK: - Init
     

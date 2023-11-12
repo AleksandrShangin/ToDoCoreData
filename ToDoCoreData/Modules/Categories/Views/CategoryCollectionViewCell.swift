@@ -16,18 +16,14 @@ final class CategoryCollectionViewCell: UICollectionViewCell {
     
     // MARK: - Properties
     
-    let titleLabel = {
-        let i = UILabel()
-        i.font = .preferredFont(forTextStyle: .title1)
-        return i
-    }()
+    private let titleLabel = setup(UILabel()) {
+        $0.font = .preferredFont(forTextStyle: .title1)
+    }
     
-    let menuButton = {
-        let i = UIButton()
-        i.setImage(UIImage(systemName: "ellipsis"), for: .normal)
-        i.clipsToBounds = true
-        return i
-    }()
+    private let menuButton = setup(UIButton()) {
+        $0.setImage(UIImage(systemName: "ellipsis"), for: .normal)
+        $0.clipsToBounds = true
+    }
     
     weak var delegate: CategoryCollectionViewCellDelegate?
     
@@ -52,7 +48,11 @@ final class CategoryCollectionViewCell: UICollectionViewCell {
         
         contentView.addSubview(titleLabel)
         
-        menuButton.addTarget(self, action: #selector(didTapMenu), for: .touchUpInside)
+        menuButton.addTarget(
+            self,
+            action: #selector(menuButtonTapped),
+            for: .touchUpInside
+        )
         contentView.addSubview(menuButton)
     }
     
@@ -74,7 +74,7 @@ final class CategoryCollectionViewCell: UICollectionViewCell {
     
     // MARK: - Actions
     
-    @objc private func didTapMenu() {
+    @objc private func menuButtonTapped() {
         delegate?.didTapMenuButton(self)
     }
     

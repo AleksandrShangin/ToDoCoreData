@@ -7,7 +7,7 @@
 
 import Foundation
 
-func setup<Type>(_ object: Type, block: (Type) -> Void) -> Type {
+func setup<T>(_ object: T, block: (T) -> Void) -> T {
     block(object)
     return object
 }

@@ -17,16 +17,13 @@ final class TaskTableViewCell: UITableViewCell {
     
     // MARK: - Properties
     
-    private let statusImageView = {
-        let i = UIImageView()
-        i.contentMode = .scaleAspectFit
-        return i
-    }()
+    private let statusImageView = setup(UIImageView()) {
+        $0.contentMode = .scaleAspectFit
+    }
     
-    private let titleLabel = {
-        let i = UILabel()
-        return i
-    }()
+    private let titleLabel = setup(UILabel()) {
+        $0.textAlignment = .left
+    }
     
     // MARK: - Init
     
@@ -58,6 +55,7 @@ final class TaskTableViewCell: UITableViewCell {
             $0.size.equalTo(44 - 16)
             $0.centerY.equalToSuperview()
         }
+        
         titleLabel.snp.makeConstraints {
             $0.left.equalTo(statusImageView.snp.right).offset(Constants.mainInsets)
             $0.right.equalToSuperview().inset(Constants.mainInsets)

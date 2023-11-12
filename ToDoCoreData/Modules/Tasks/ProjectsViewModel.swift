@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import CoreData
 
 protocol ProjectsViewModel {
     var projects: CurrentValueSubject<[Organizer], Never> { get }

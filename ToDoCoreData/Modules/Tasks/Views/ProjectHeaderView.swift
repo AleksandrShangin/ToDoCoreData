@@ -16,18 +16,14 @@ final class ProjectHeaderView: UITableViewHeaderFooterView {
     
     // MARK: - Properties
     
-    private let titleLabel = {
-        let i = UILabel()
-        i.font = .preferredFont(forTextStyle: .title2)
-        return i
-    }()
+    private let titleLabel = setup(UILabel()) {
+        $0.font = .preferredFont(forTextStyle: .title2)
+    }
     
-    private let menuButton = {
-        let i = UIButton()
-        i.setImage(UIImage(systemName: "ellipsis"), for: .normal)
-        i.clipsToBounds = true
-        return i
-    }()
+    private let menuButton = setup(UIButton()) {
+        $0.setImage(UIImage(systemName: "ellipsis"), for: .normal)
+        $0.clipsToBounds = true
+    }
     
     weak var delegate: ProjectHeaderViewDelegate?
     
@@ -46,9 +42,15 @@ final class ProjectHeaderView: UITableViewHeaderFooterView {
     // MARK: - Setup
     
     private func setupSubviews() {
+        backgroundColor = .systemBackground
+        
         contentView.addSubview(titleLabel)
         
-        menuButton.addTarget(self, action: #selector(didTapMenuButton), for: .touchUpInside)
+        menuButton.addTarget(
+            self,
+            action: #selector(menuButtonTapped),
+            for: .touchUpInside
+        )
         contentView.addSubview(menuButton)
     }
     
@@ -69,7 +71,7 @@ final class ProjectHeaderView: UITableViewHeaderFooterView {
     // MARK: - Actions
     
     @objc
-    private func didTapMenuButton() {
+    private func menuButtonTapped() {
         delegate?.didTapMenuButton(self)
     }
     

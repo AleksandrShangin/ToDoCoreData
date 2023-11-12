@@ -12,23 +12,16 @@ final class CategoriesView: UIView {
     
     //MARK: - Properties
     
-    let collectionView = {
-        let layout = {
-            let i = UICollectionViewFlowLayout()
-            i.scrollDirection = .vertical
-            return i
-        }()
-        
-        let i = UICollectionView(
-            frame: .zero,
-            collectionViewLayout: layout
-        )
-        i.register(cell: CategoryCollectionViewCell.self)
-        i.showsVerticalScrollIndicator = false
-        i.automaticallyAdjustsScrollIndicatorInsets = true
-        i.contentInsetAdjustmentBehavior = .automatic
-        return i
-    }()
+    private let layout = setup(UICollectionViewFlowLayout()) {
+        $0.scrollDirection = .vertical
+    }
+    
+    lazy var collectionView = setup(UICollectionView(frame: .zero, collectionViewLayout: layout)) {
+        $0.register(cell: CategoryCollectionViewCell.self)
+        $0.showsVerticalScrollIndicator = false
+        $0.automaticallyAdjustsScrollIndicatorInsets = true
+        $0.contentInsetAdjustmentBehavior = .automatic
+    }
     
     //MARK: - Init
     
