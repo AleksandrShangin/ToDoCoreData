@@ -8,11 +8,9 @@
 import UIKit
 
 class BaseRouter {
-    
-    var viewController: UIViewController
+    weak var viewController: UIViewController?
     
     init(viewController: UIViewController) {
         self.viewController = viewController
     }
-    
 }
