@@ -53,7 +53,7 @@ final class CategoriesViewController: UIViewController, CustomViewProtocol {
     
     private func configureNavigationBar() {
         navigationItem.title = L10n.Categories.title
-        
+        navigationItem.backButtonTitle = ""
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .add,
             target: self,
