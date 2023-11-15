@@ -56,14 +56,14 @@ final class ProjectHeaderView: UITableViewHeaderFooterView {
     
     private func setupConstraints() {
         titleLabel.snp.makeConstraints {
-            $0.left.equalTo(Constants.mainInsets)
+            $0.left.equalTo(ViewConstants.mainInsets)
             $0.height.equalToSuperview()
         }
         
         menuButton.snp.makeConstraints {
             $0.top.bottom.equalToSuperview()
-            $0.left.lessThanOrEqualTo(titleLabel.snp.right).offset(Constants.mainInsets)
-            $0.right.equalToSuperview().inset(Constants.mainInsets * 2)
+            $0.left.lessThanOrEqualTo(titleLabel.snp.right).offset(ViewConstants.mainInsets)
+            $0.right.equalToSuperview().inset(ViewConstants.mainInsets * 2)
             $0.width.equalTo(44)
         }
     }

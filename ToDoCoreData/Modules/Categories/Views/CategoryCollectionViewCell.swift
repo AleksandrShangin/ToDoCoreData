@@ -58,15 +58,15 @@ final class CategoryCollectionViewCell: UICollectionViewCell {
     
     private func setupConstraints() {
         titleLabel.snp.makeConstraints {
-            $0.top.equalTo(Constants.mainInsets)
-            $0.left.equalTo(Constants.mainInsets)
-            $0.right.equalTo(menuButton.snp.left).offset(-Constants.mainInsets)
+            $0.top.equalTo(ViewConstants.mainInsets)
+            $0.left.equalTo(ViewConstants.mainInsets)
+            $0.right.equalTo(menuButton.snp.left).offset(-ViewConstants.mainInsets)
             $0.height.equalTo((120 - 16) / 2)
         }
         
         menuButton.snp.makeConstraints {
-            $0.top.equalTo(Constants.mainInsets)
-            $0.right.equalTo(-Constants.mainInsets * 2)
+            $0.top.equalTo(ViewConstants.mainInsets)
+            $0.right.equalTo(-ViewConstants.mainInsets * 2)
             $0.size.equalTo(40)
         }
     }
