@@ -84,6 +84,20 @@ final class ProjectsViewController: UIViewController, CustomViewProtocol {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in self?.presentErrorAlert(message: $0.localizedDescription) }
             .store(in: &cancellable)
+        
+        viewModel.onTaskUpdate
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] indexPath in
+                self?.customView.tableView.reloadRows(at: [indexPath], with: .automatic)
+            }
+            .store(in: &cancellable)
+        
+        viewModel.onProjectUpdate
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] indexSet in
+                self?.customView.tableView.reloadSections(indexSet, with: .automatic)
+            }
+            .store(in: &cancellable)
     }
     
     // MARK: - Actions
@@ -96,7 +110,7 @@ final class ProjectsViewController: UIViewController, CustomViewProtocol {
         }
     }
     
-    private func didTapMenu(project: Project) {
+    private func didTapMenu(project: Project, indexSet: IndexSet) {
         self.presentAlert(
             actions: [
                 UIAlertAction(title: L10n.Task.addNew, style: .default) { [weak self] _ in
@@ -107,7 +121,7 @@ final class ProjectsViewController: UIViewController, CustomViewProtocol {
                 },
                 UIAlertAction(title: L10n.Project.rename, style: .default) { [weak self] _ in
                     self?.presentAddAlert(title: L10n.Project.rename, updateName: project.name) { newName in
-                        self?.viewModel.updateProject(project: project, newName: newName)
+                        self?.viewModel.updateProject(project: project, newName: newName, indexSet: indexSet)
                     }
                 },
                 UIAlertAction(title: L10n.Project.delete, style: .destructive) { [weak self] _ in
@@ -121,22 +135,23 @@ final class ProjectsViewController: UIViewController, CustomViewProtocol {
         )
     }
     
-    private func didSelectTask(_ selectedTask: Task) {
+    private func didSelectTask(_ selectedTask: Task, indexPath: IndexPath) {
         let undoCompleteAction = UIAlertAction(title: L10n.Task.undoComplete, style: .default) { [weak self] _ in
             guard let self = self else { return }
             self.presentOkAlert(title: "\(L10n.Task.undoComplete)?") {
-                self.viewModel.undoCompleteTask(selectedTask)
+                self.viewModel.undoCompleteTask(selectedTask, indexPath: indexPath)
             }
         }
         
         let completeAction = UIAlertAction(title: L10n.Task.complete, style: .default) { [weak self] _ in
             guard let self = self else { return }
-            self.viewModel.completeTask(selectedTask)
+            self.viewModel.completeTask(selectedTask, indexPath: indexPath)
         }
+        
         let updateAction = UIAlertAction(title: L10n.Task.rename, style: .default) { [weak self] _ in
             guard let self = self else { return }
             self.presentAddAlert(title: L10n.Task.rename, updateName: selectedTask.name) { newName in
-                self.viewModel.renameTask(selectedTask, with: newName)
+                self.viewModel.renameTask(selectedTask, with: newName, indexPath: indexPath)
             }
         }
         
@@ -177,7 +192,7 @@ extension ProjectsViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let selectedTask = viewModel.projects.value[indexPath.section].tasks[indexPath.row]
-        self.didSelectTask(selectedTask)
+        self.didSelectTask(selectedTask, indexPath: indexPath)
     }
 }
 
@@ -188,7 +203,7 @@ extension ProjectsViewController: ProjectHeaderViewDelegate {
     func didTapMenuButton(_ view: ProjectHeaderView) {
         let section = view.tag
         let project = viewModel.projects.value[section].project
-        self.didTapMenu(project: project)
+        self.didTapMenu(project: project, indexSet: [section])
     }
 }
 

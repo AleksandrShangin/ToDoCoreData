@@ -42,8 +42,6 @@ final class ProjectHeaderView: UITableViewHeaderFooterView {
     // MARK: - Setup
     
     private func setupSubviews() {
-        backgroundColor = .systemBackground
-        
         contentView.addSubview(titleLabel)
         
         menuButton.addTarget(

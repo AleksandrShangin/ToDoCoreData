@@ -11,18 +11,21 @@ import CoreData
 
 protocol ProjectsViewModel {
     var projects: CurrentValueSubject<[Organizer], Never> { get }
+    
     var onError: PassthroughSubject<Error, Never> { get }
+    var onProjectUpdate: PassthroughSubject<IndexSet, Never> { get }
+    var onTaskUpdate: PassthroughSubject<IndexPath, Never> { get }
     
     func fetchProjectsAndTasks()
     
     func createNewProject(name: String)
-    func updateProject(project: Project, newName: String)
+    func updateProject(project: Project, newName: String, indexSet: IndexSet)
     func deleteProject(project: Project)
     
     func createNewTask(project: Project, name: String)
-    func completeTask(_ task: Task)
-    func undoCompleteTask(_ task: Task)
-    func renameTask(_ task: Task, with newName: String)
+    func completeTask(_ task: Task, indexPath: IndexPath)
+    func undoCompleteTask(_ task: Task, indexPath: IndexPath)
+    func renameTask(_ task: Task, with newName: String, indexPath: IndexPath)
     func deleteTask(_ task: Task)
 }
 
@@ -33,6 +36,9 @@ final class ProjectsViewModelImpl: ProjectsViewModel {
     let category: Category
     let projects = CurrentValueSubject<[Organizer], Never>([Organizer]())
     var onError = PassthroughSubject<Error, Never>()
+    
+    var onProjectUpdate = PassthroughSubject<IndexSet, Never>()
+    var onTaskUpdate = PassthroughSubject<IndexPath, Never>()
     
     //MARK: - Private Properties
     
@@ -79,7 +85,7 @@ final class ProjectsViewModelImpl: ProjectsViewModel {
             .store(in: &subscriptions)
     }
     
-    func updateProject(project: Project, newName: String) {
+    func updateProject(project: Project, newName: String, indexSet: IndexSet) {
         project.name = newName
         
         persistenceService.update(entity: project)
@@ -87,9 +93,9 @@ final class ProjectsViewModelImpl: ProjectsViewModel {
                 if case .failure(let error) = completion {
                     self?.onError.send(error)
                 }
-            }, receiveValue: {
-                [weak self] in
-                    self?.fetchProjectsAndTasks()
+            }, receiveValue: { [weak self] in
+                self?.onProjectUpdate.send(indexSet)
+//                self?.fetchProjectsAndTasks()
             })
             .store(in: &subscriptions)
     }
@@ -126,7 +132,7 @@ final class ProjectsViewModelImpl: ProjectsViewModel {
             .store(in: &subscriptions)
     }
     
-    func completeTask(_ task: Task) {
+    func completeTask(_ task: Task, indexPath: IndexPath) {
         task.isCompleted = true
         
         persistenceService.update(entity: task)
@@ -135,12 +141,13 @@ final class ProjectsViewModelImpl: ProjectsViewModel {
                     self?.onError.send(error)
                 }
             }, receiveValue: { [weak self] in
-                self?.fetchProjectsAndTasks()
+                self?.onTaskUpdate.send(indexPath)
+//                self?.fetchProjectsAndTasks()
             })
             .store(in: &subscriptions)
     }
     
-    func undoCompleteTask(_ task: Task) {
+    func undoCompleteTask(_ task: Task, indexPath: IndexPath) {
         task.isCompleted = false
         
         persistenceService.update(entity: task)
@@ -149,12 +156,13 @@ final class ProjectsViewModelImpl: ProjectsViewModel {
                     self?.onError.send(error)
                 }
             }, receiveValue: { [weak self] in
-                self?.fetchProjectsAndTasks()
+//                self?.fetchProjectsAndTasks()
+                self?.onTaskUpdate.send(indexPath)
             })
             .store(in: &subscriptions)
     }
     
-    func renameTask(_ task: Task, with newName: String) {
+    func renameTask(_ task: Task, with newName: String, indexPath: IndexPath) {
         task.name = newName
         
         persistenceService.update(entity: task)
@@ -163,7 +171,8 @@ final class ProjectsViewModelImpl: ProjectsViewModel {
                     self?.onError.send(error)
                 }
             }, receiveValue: { [weak self] in
-                self?.fetchProjectsAndTasks()
+//                self?.fetchProjectsAndTasks()
+                self?.onTaskUpdate.send(indexPath)
             })
             .store(in: &subscriptions)
     }
@@ -176,6 +185,7 @@ final class ProjectsViewModelImpl: ProjectsViewModel {
                 }
             }, receiveValue: { [weak self] in
                 self?.fetchProjectsAndTasks()
+//                self?.onDelete.send(indexPath)
             })
             .store(in: &subscriptions)
     }

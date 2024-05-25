@@ -64,7 +64,7 @@ final class CategoriesViewController: UIViewController, CustomViewProtocol {
     private func configureViews() {
         dataSource = CategoriesDataSource(collectionView: self.customView.collectionView)
         customView.collectionView.dataSource = dataSource
-        dataSource.menuButtonTapped = self.didTapMenu(_:)
+        dataSource.menuButtonTapped = self.didTapMenu(_:indexPath:)
         customView.collectionView.delegate = self
     }
     
@@ -86,6 +86,13 @@ final class CategoriesViewController: UIViewController, CustomViewProtocol {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in self?.presentErrorAlert(message: $0.localizedDescription) }
             .store(in: &subscriptions)
+        
+        viewModel.onUpdate
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] indexPath in
+                self?.customView.collectionView.reloadItems(at: [indexPath])
+            }
+            .store(in: &subscriptions)
     }
     
     // MARK: - Actions
@@ -101,12 +108,12 @@ final class CategoriesViewController: UIViewController, CustomViewProtocol {
         self.router.showTasks(of: selectedCategory)
     }
     
-    private func didTapMenu(_ selectedCategory: Category) {
+    private func didTapMenu(_ selectedCategory: Category, indexPath: IndexPath) {
         self.presentAlert(
             actions: [
                 UIAlertAction(title: L10n.Categories.rename, style: .default) { [weak self] _ in
                     self?.presentAddAlert(title: L10n.Categories.rename, updateName: selectedCategory.name) { newName in
-                        self?.viewModel.rename(selectedCategory, with: newName)
+                        self?.viewModel.rename(selectedCategory, with: newName, indexPath: indexPath)
                     }
                 },
                 UIAlertAction(title: L10n.Categories.delete, style: .destructive) { [weak self] _ in
@@ -152,7 +159,7 @@ extension CategoriesViewController: UICollectionViewDelegate, UICollectionViewDe
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: true)
-        let selectedCategory = viewModel.categories.value[indexPath.row]
+        let selectedCategory = viewModel.categories.value[indexPath.item]
         self.didSelectCategory(selectedCategory)
     }
 }

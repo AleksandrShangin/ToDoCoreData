@@ -19,7 +19,7 @@ final class CategoriesDataSource: NSObject, UICollectionViewDataSource, Category
         }
     }
     
-    var menuButtonTapped: ParameterClosure<Category>?
+    var menuButtonTapped: ((Category, IndexPath) -> Void)?
     
     //MARK: - Init
     
@@ -46,13 +46,11 @@ final class CategoriesDataSource: NSObject, UICollectionViewDataSource, Category
     }
     
     func didTapMenuButton(_ cell: CategoryCollectionViewCell) {
-        guard let index = collectionView.indexPath(for: cell) else {
-            assertionFailure("Index must be set")
-            return
-        }
+        guard let index = collectionView.indexPath(for: cell) else { return }
+        
         let selectedCategory = items[index.item]
         
-        self.menuButtonTapped?(selectedCategory)
+        self.menuButtonTapped?(selectedCategory, index)
     }
     
 }

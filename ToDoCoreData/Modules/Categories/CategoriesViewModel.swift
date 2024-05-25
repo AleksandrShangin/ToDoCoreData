@@ -11,11 +11,12 @@ import Combine
 protocol CategoriesViewModel {
     var categories: CurrentValueSubject<[Category], Never> { get }
     var onError: PassthroughSubject<Error, Never> { get }
+    var onUpdate: PassthroughSubject<IndexPath, Never> { get }
     
     func fetchCategories()
     func createCategory(name: String)
     func delete(_ category: Category)
-    func rename(_ category: Category, with newName: String)
+    func rename(_ category: Category, with newName: String, indexPath: IndexPath)
 }
 
 final class CategoriesViewModelImpl: CategoriesViewModel {
@@ -24,6 +25,7 @@ final class CategoriesViewModelImpl: CategoriesViewModel {
     
     var categories = CurrentValueSubject<[Category], Never>([Category]())
     var onError = PassthroughSubject<Error, Never>()
+    var onUpdate = PassthroughSubject<IndexPath, Never>()
     
     //MARK: - Private Properties
     
@@ -65,7 +67,7 @@ final class CategoriesViewModelImpl: CategoriesViewModel {
             .store(in: &subscriptions)
     }
     
-    func rename(_ category: Category, with newName: String) {
+    func rename(_ category: Category, with newName: String, indexPath: IndexPath) {
         category.name = newName
         
         persistenceService.update(entity: category)
@@ -74,7 +76,8 @@ final class CategoriesViewModelImpl: CategoriesViewModel {
                     self?.onError.send(error)
                 }
             }, receiveValue: { [weak self] in
-                self?.fetchCategories()
+                self?.onUpdate.send(indexPath)
+//                self?.fetchCategories()
             })
             .store(in: &subscriptions)
     }
