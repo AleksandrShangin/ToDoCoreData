@@ -84,7 +84,7 @@ final class CategoriesViewController: UIViewController, CustomViewProtocol {
         
         viewModel.onError
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] in self?.presentErrorAlert(message: $0.localizedDescription) }
+            .sink { [weak self] in self?.presentAlert(type: .error(message: $0.localizedDescription)) }
             .store(in: &subscriptions)
         
         viewModel.onUpdate
@@ -98,10 +98,14 @@ final class CategoriesViewController: UIViewController, CustomViewProtocol {
     // MARK: - Actions
     
     @objc private func didTapAdd() {
-        presentAddAlert(title: L10n.Categories.new) { [weak self] name in
-            guard let self = self else { return }
-            self.viewModel.createCategory(name: name)
-        }
+        self.presentAlert(type: .withField(
+            title: L10n.Categories.new,
+            textField: AlertFieldModel(type: .category),
+            okHandler: { [weak self] model in
+                guard let self = self, let name = model.text else { return }
+                self.viewModel.createCategory(name: name)
+            })
+        )
     }
     
     private func didSelectCategory(_ selectedCategory: Category) {
@@ -109,21 +113,40 @@ final class CategoriesViewController: UIViewController, CustomViewProtocol {
     }
     
     private func didTapMenu(_ selectedCategory: Category, indexPath: IndexPath) {
-        self.presentAlert(
+        self.presentAlert(type: .bottomSheet(
             actions: [
-                UIAlertAction(title: L10n.Categories.rename, style: .default) { [weak self] _ in
-                    self?.presentAddAlert(title: L10n.Categories.rename, updateName: selectedCategory.name) { newName in
-                        self?.viewModel.rename(selectedCategory, with: newName, indexPath: indexPath)
+                AlertActionModel(
+                    title: L10n.Categories.rename,
+                    handler: { [weak self] _ in
+                        self?.presentAlert(type: .withField(
+                            title: L10n.Categories.rename,
+                            textField: AlertFieldModel(
+                                type: .category,
+                                initialText: selectedCategory.name
+                            ),
+                            okHandler: { model in
+                                if let newName = model.text {
+                                    self?.viewModel.rename(selectedCategory, with: newName, indexPath: indexPath)
+                                }
+                            })
+                        )
                     }
-                },
-                UIAlertAction(title: L10n.Categories.delete, style: .destructive) { [weak self] _ in
-                    self?.presentOkAlert(title: "\(L10n.Categories.delete)?", message: selectedCategory.name, okHandler: {
-                        self?.viewModel.delete(selectedCategory)
-                    })
-                },
-                UIAlertAction(title: L10n.Common.cancel, style: .cancel)
-            ],
-            style: .actionSheet
+                ),
+                AlertActionModel(
+                    title: L10n.Categories.delete,
+                    style: .destructive,
+                    handler: { [weak self] _ in
+                        self?.presentAlert(type: .info(
+                            title: "\(L10n.Categories.delete)?",
+                            message: selectedCategory.name,
+                            okHandler: {
+                                self?.viewModel.delete(selectedCategory)
+                            })
+                        )
+                    }
+                ),
+                AlertActionModel(title: L10n.Common.cancel)
+            ])
         )
     }
 

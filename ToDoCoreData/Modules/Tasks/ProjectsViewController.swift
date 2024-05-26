@@ -82,7 +82,7 @@ final class ProjectsViewController: UIViewController, CustomViewProtocol {
         
         viewModel.onError
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] in self?.presentErrorAlert(message: $0.localizedDescription) }
+            .sink { [weak self] in self?.presentAlert(type: .error(message: $0.localizedDescription)) }
             .store(in: &cancellable)
         
         viewModel.onTaskUpdate
@@ -104,69 +104,117 @@ final class ProjectsViewController: UIViewController, CustomViewProtocol {
     
     @objc
     private func didTapAddButton() {
-        presentAddAlert(title: L10n.Project.new) { [weak self] name in
-            guard let self = self else { return }
-            self.viewModel.createNewProject(name: name)
-        }
+        self.presentAlert(type: .withField(
+            title: L10n.Project.new,
+            textField: AlertFieldModel(type: .project),
+            okHandler: { [weak self] model in
+                guard let self = self, let name = model.text else { return }
+                self.viewModel.createNewProject(name: name)
+            })
+        )
     }
     
     private func didTapMenu(project: Project, indexSet: IndexSet) {
-        self.presentAlert(
+        self.presentAlert(type: .bottomSheet(
             actions: [
-                UIAlertAction(title: L10n.Task.addNew, style: .default) { [weak self] _ in
-                    guard let self = self else { return }
-                    self.presentAddAlert(title: L10n.Task.new) { taskName in
-                        self.viewModel.createNewTask(project: project, name: taskName)
+                AlertActionModel(
+                    title: L10n.Task.new,
+                    handler: { [weak self] _ in
+                        self?.presentAlert(type: .withField(
+                            title: L10n.Task.new,
+                            textField: AlertFieldModel(type: .task),
+                            okHandler: { model in
+                                if let taskName = model.text {
+                                    self?.viewModel.createNewTask(project: project, name: taskName)
+                                }
+                            })
+                        )
                     }
-                },
-                UIAlertAction(title: L10n.Project.rename, style: .default) { [weak self] _ in
-                    self?.presentAddAlert(title: L10n.Project.rename, updateName: project.name) { newName in
-                        self?.viewModel.updateProject(project: project, newName: newName, indexSet: indexSet)
+                ),
+                AlertActionModel(
+                    title: L10n.Project.rename,
+                    handler: { [weak self] _ in
+                        self?.presentAlert(type: .withField(
+                            title: L10n.Project.rename,
+                            textField: AlertFieldModel(type: .project, initialText: project.name),
+                            okHandler: { [weak self] model in
+                                if let newName = model.text {
+                                    self?.viewModel.updateProject(project: project, newName: newName, indexSet: indexSet)
+                                }
+                            })
+                        )
                     }
-                },
-                UIAlertAction(title: L10n.Project.delete, style: .destructive) { [weak self] _ in
-                    self?.presentOkAlert(title: "\(L10n.Project.delete)?", message: project.name, okHandler: {
-                        self?.viewModel.deleteProject(project: project)
-                    })
-                },
-                UIAlertAction(title: L10n.Common.cancel, style: .cancel)
-            ],
-            style: .actionSheet
+                ),
+                AlertActionModel(
+                    title: L10n.Project.delete,
+                    handler: { [weak self] _ in
+                        self?.presentAlert(type: .info(
+                            title: "\(L10n.Project.delete)?",
+                            okHandler: {
+                                self?.viewModel.deleteProject(project: project)
+                            })
+                        )
+                    }
+                ),
+                AlertActionModel(title: L10n.Common.cancel)
+            ])
         )
     }
     
     private func didSelectTask(_ selectedTask: Task, indexPath: IndexPath) {
-        let undoCompleteAction = UIAlertAction(title: L10n.Task.undoComplete, style: .default) { [weak self] _ in
-            guard let self = self else { return }
-            self.presentOkAlert(title: "\(L10n.Task.undoComplete)?") {
-                self.viewModel.undoCompleteTask(selectedTask, indexPath: indexPath)
+        let undoCompleteAction = AlertActionModel(
+            title: L10n.Task.undoComplete,
+            handler: { [weak self] _ in
+                self?.presentAlert(type: .info(
+                    title: "\(L10n.Task.undoComplete)?",
+                    okHandler: {
+                        self?.viewModel.undoCompleteTask(selectedTask, indexPath: indexPath)
+                    })
+                )
             }
-        }
+        )
         
-        let completeAction = UIAlertAction(title: L10n.Task.complete, style: .default) { [weak self] _ in
-            guard let self = self else { return }
-            self.viewModel.completeTask(selectedTask, indexPath: indexPath)
-        }
-        
-        let updateAction = UIAlertAction(title: L10n.Task.rename, style: .default) { [weak self] _ in
-            guard let self = self else { return }
-            self.presentAddAlert(title: L10n.Task.rename, updateName: selectedTask.name) { newName in
-                self.viewModel.renameTask(selectedTask, with: newName, indexPath: indexPath)
+        let completeAction = AlertActionModel(
+            title: L10n.Task.complete,
+            handler: { [weak self] _ in
+                self?.viewModel.completeTask(selectedTask, indexPath: indexPath)
             }
-        }
+        )
         
-        let deleteAction = UIAlertAction(title: L10n.Task.delete, style: .destructive) { [weak self] _ in
-            guard let self = self else { return }
-            self.presentOkAlert(title: "\(L10n.Task.delete)?", message: selectedTask.name) {
-                self.viewModel.deleteTask(selectedTask)
+        let updateAction = AlertActionModel(
+            title: L10n.Task.rename,
+            handler: { [weak self] _ in
+                self?.presentAlert(type: .withField(
+                    title: L10n.Task.rename,
+                    textField: AlertFieldModel(type: .category, initialText: selectedTask.name),
+                    okHandler: { model in
+                        if let newName = model.text {
+                            self?.viewModel.renameTask(selectedTask, with: newName, indexPath: indexPath)
+                        }
+                    })
+                )
             }
-        }
+        )
         
-        let cancelAction = UIAlertAction(title: L10n.Common.cancel, style: .cancel)
+        let deleteAction = AlertActionModel(
+            title: L10n.Task.delete,
+            style: .destructive,
+            handler: { [weak self] _ in
+                self?.presentAlert(type: .info(
+                    title: "\(L10n.Task.delete)?",
+                    message: selectedTask.name,
+                    okHandler: {
+                        self?.viewModel.deleteTask(selectedTask)
+                    })
+                )
+            }
+        )
+        
+        let cancelAction = AlertActionModel(title: L10n.Common.cancel)
         
         let actions = !selectedTask.isCompleted ? [completeAction, updateAction, deleteAction, cancelAction] : [undoCompleteAction, updateAction, deleteAction, cancelAction]
         
-        presentAlert(actions: actions, style: .actionSheet)
+        presentAlert(type: .bottomSheet(actions: actions))
     }
 
 }

@@ -7,78 +7,44 @@
 
 import UIKit
 
+enum AlertType {
+    case error(message: String)
+    case info(title: String, message: String? = nil, okHandler:  VoidClosure)
+    case withField(title: String, message: String? = nil, textField: AlertFieldModel, okHandler: ParameterClosure<AlertFieldModel>)
+    case bottomSheet(actions: [AlertActionModel])
+}
+
 extension UIViewController {
     
-    /// Base Alert
-    func presentAlert(
-        title: String? = nil,
-        message: String? = nil,
-        actions: [UIAlertAction],
-        style: UIAlertController.Style = .alert
-    ) {
-        let alertController = UIAlertController(
-            title: title,
-            message: message,
-            preferredStyle: style
-        )
-        for action in actions {
-            alertController.addAction(action)
-        }
-        present(alertController, animated: true)
-    }
-    
-    /// Base Error Alert
-    func presentErrorAlert(message: String) {
-        presentAlert(
-            title: L10n.Common.error,
-            message: message,
-            actions: [
-                UIAlertAction(title: L10n.Common.ok, style: .cancel)
-            ]
-        )
-    }
-    
-    /// Base Ok Alert
-    func presentOkAlert(
-        title: String,
-        message: String? = nil,
-        okHandler: @escaping VoidClosure
-    ) {
-        presentAlert(
-            title: title,
-            message: message,
-            actions: [
-                UIAlertAction(title: L10n.Common.ok, style: .default) { _ in
-                    okHandler()
-                },
-                UIAlertAction(title: L10n.Common.cancel, style: .cancel)
-            ]
-        )
-    }
-    
-    /// Base Add Alert
-    func presentAddAlert(
-        title: String,
-        message: String? = nil,
-        updateName: String? = nil,
-        okHandler: @escaping ParameterClosure<String>
-    ) {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+    func presentAlert(type: AlertType) {
+        let alert: UIAlertController
         
-        alert.addTextField { textField in
-            textField.autocapitalizationType = .words
-            textField.spellCheckingType = .yes
-            
-            guard let updateName = updateName else {
-                return
-            }
-            textField.text = updateName
+        switch type {
+        case .error(let message):
+            alert = AlertFactory.createErrorAlert(message: message)
+        case .info(let title, let message, let okHandler):
+            alert = AlertFactory.createInfoAlert(title: title, message: message, okHandler: okHandler)
+        case .withField(let title, let message, let textField, let okHandler):
+            alert = AlertFactory.createFieldAlert(
+                title: title,
+                message: message,
+                textFields: [textField],
+                actions: [
+                    AlertActionModel(
+                        title: L10n.Common.ok,
+                        style: .default,
+                        handler: { models in
+                            if let model = models?.first {
+                                okHandler(model)
+                            }
+                        }
+                    ),
+                    AlertActionModel(title: L10n.Common.cancel, style: .cancel, handler: nil)
+                ]
+            )
+        case .bottomSheet(let actions):
+            alert = AlertFactory.createBottomSheet(actions: actions)
         }
-        alert.addAction(UIAlertAction(title: L10n.Common.ok, style: .default) { _ in
-            guard let text = alert.textFields?.last?.text else { return }
-            okHandler(text)
-        })
-        alert.addAction(UIAlertAction(title: L10n.Common.cancel, style: .cancel))
         
         present(alert, animated: true)
     }
