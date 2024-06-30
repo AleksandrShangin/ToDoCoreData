@@ -16,7 +16,9 @@ protocol ProjectsViewModel {
     var onProjectUpdate: PassthroughSubject<IndexSet, Never> { get }
     var onTaskUpdate: PassthroughSubject<IndexPath, Never> { get }
     
-    func fetchProjectsAndTasks()
+    var showCompleted: CurrentValueSubject<Bool, Never> { get }
+    
+    func fetchProjectsAndTasks(showCompleted: Bool)
     
     func createNewProject(name: String)
     func updateProject(project: Project, newName: String, indexSet: IndexSet)
@@ -27,6 +29,12 @@ protocol ProjectsViewModel {
     func undoCompleteTask(_ task: Task, indexPath: IndexPath)
     func renameTask(_ task: Task, with newName: String, indexPath: IndexPath)
     func deleteTask(_ task: Task)
+}
+
+extension ProjectsViewModel {
+    func fetchProjectsAndTasks() {
+        self.fetchProjectsAndTasks(showCompleted: true)
+    }
 }
 
 final class ProjectsViewModelImpl: ProjectsViewModel {
@@ -40,6 +48,8 @@ final class ProjectsViewModelImpl: ProjectsViewModel {
     var onProjectUpdate = PassthroughSubject<IndexSet, Never>()
     var onTaskUpdate = PassthroughSubject<IndexPath, Never>()
     
+    var showCompleted = CurrentValueSubject<Bool, Never>(true)
+    
     //MARK: - Private Properties
     
     private let persistenceService: PersistenceService
@@ -50,11 +60,17 @@ final class ProjectsViewModelImpl: ProjectsViewModel {
     init(category: Category, persistenceService: PersistenceService) {
         self.category = category
         self.persistenceService = persistenceService
+        
+        showCompleted.sink { [weak self] in
+            guard let self = self else { return }
+            self.fetchProjectsAndTasks(showCompleted: $0)
+        }
+        .store(in: &subscriptions)
     }
     
     // MARK: - Project Methods
     
-    func fetchProjectsAndTasks() {
+    func fetchProjectsAndTasks(showCompleted: Bool = true) {
         let predicate = NSPredicate(format: "category.name = %@", category.name)
         
         persistenceService.fetch(entity: Project.self, predicate: predicate)
@@ -63,7 +79,16 @@ final class ProjectsViewModelImpl: ProjectsViewModel {
                     self?.onError.send(error)
                 }
             }, receiveValue: { [weak self] projects in
-                let projectTasks = projects.map { Organizer(project: $0, tasks: Array($0.tasks)) }
+                let projectTasks = projects.map {
+                    if showCompleted {
+                        Organizer(project: $0, tasks: Array($0.tasks))
+                    } else {
+                        Organizer(
+                            project: $0,
+                            tasks: Array($0.tasks).filter { !$0.isCompleted }
+                        )
+                    }
+                }
                 self?.projects.send(projectTasks)
             })
             .store(in: &subscriptions)

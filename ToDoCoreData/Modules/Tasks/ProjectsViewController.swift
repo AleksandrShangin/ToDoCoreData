@@ -46,11 +46,19 @@ final class ProjectsViewController: UIViewController, CustomViewProtocol {
     // MARK: - Configure
     
     private func configureNavigationBar() {
-        navigationItem.rightBarButtonItem = UIBarButtonItem(
+        let showCompletedButton = UIBarButtonItem(
+            image: UIImage(systemName: "checklist.checked"),
+            style: .plain,
+            target: self,
+            action: #selector(didTapShowCompleted))
+        
+        let addButton = UIBarButtonItem(
             barButtonSystemItem: .add,
             target: self,
             action: #selector(didTapAddButton)
         )
+        
+        navigationItem.rightBarButtonItems = [addButton, showCompletedButton]
     }
     
     private func configureViews() {
@@ -101,6 +109,11 @@ final class ProjectsViewController: UIViewController, CustomViewProtocol {
     }
     
     // MARK: - Actions
+    
+    @objc
+    private func didTapShowCompleted() {
+        self.viewModel.showCompleted.value.toggle()
+    }
     
     @objc
     private func didTapAddButton() {
