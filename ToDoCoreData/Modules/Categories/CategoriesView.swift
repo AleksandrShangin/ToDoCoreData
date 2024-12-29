@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-final class CategoriesView: UIView {
+final class CategoriesView: BaseView {
     
     //MARK: - Properties
     
@@ -23,27 +23,15 @@ final class CategoriesView: UIView {
         $0.contentInsetAdjustmentBehavior = .automatic
     }
     
-    //MARK: - Init
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupSubviews()
-        setupConstraints()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
- 
     //MARK: - Setup
     
-    private func setupSubviews() {
+    override func setupSubviews() {
         backgroundColor = .systemBackground
         
         addSubview(collectionView)
     }
     
-    private func setupConstraints() {
+    override func setupConstraints() {
         collectionView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }

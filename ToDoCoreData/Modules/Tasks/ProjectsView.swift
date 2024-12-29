@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-final class ProjectsView: UIView {
+final class ProjectsView: BaseView {
     
     //MARK: - Properties
     
@@ -18,27 +18,13 @@ final class ProjectsView: UIView {
         $0.contentInset = UIEdgeInsets(top: 16, left: 0, bottom: 0, right: 0)
     }
     
-    //MARK: - Init
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupSubviews()
-        setupConstraints()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
- 
     //MARK: - Setup
     
-    private func setupSubviews() {
-        backgroundColor = .systemBackground
-        
+    override func setupSubviews() {
         addSubview(tableView)
     }
     
-    private func setupConstraints() {
+    override func setupConstraints() {
         tableView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
